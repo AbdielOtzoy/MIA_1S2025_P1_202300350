@@ -1,0 +1,189 @@
+package commands
+
+import (
+	structures "backend/structures"
+	utils "backend/utils"
+	"errors"
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
+
+type FDISK struct {
+	Size 	int
+	unit 	string
+	path 	string
+	type_ 	string
+	fit 	string
+	name 	string
+
+}
+
+func ParseFdisk(tokens []string) (*FDISK, error) {
+	cmd := &FDISK{} // create the mkdisk command
+
+	args := strings.Join(tokens, " ") // join the tokens to get the arguments
+
+	re := regexp.MustCompile(`-size=\d+|-unit=[kKmM]|-fit=[bBfF]{2}|-path="[^"]+"|-path=[^\s]+|-type=[pPeElL]|-name="[^"]+"|-name=[^\s]+`)
+
+	matches := re.FindAllString(args, -1) // find all the matches
+
+	for _, match := range matches {
+		kv := strings.SplitN(match, "=", 2) // split the match in key and value
+		if len(kv) != 2 {
+			return nil, fmt.Errorf("invalid argument: %s", match)
+		}
+		key, value := strings.ToLower(kv[0]), kv[1]
+
+		if strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"") {
+			value = strings.Trim(value, "\"")
+		}
+
+		switch key {
+			case "-size":
+				size, err := strconv.Atoi(value) // convert the value to integer
+				if err != nil || size <= 0 {
+					return nil, errors.New("invalid size")
+				}
+				cmd.Size = size
+			case "-unit":
+				if value != "K" && value != "M" {
+					return nil, errors.New("invalid unit")
+				}
+				cmd.unit = strings.ToUpper(value)
+			case "-fit":
+				value = strings.ToUpper(value)
+				if value != "BF" && value != "FF" && value != "WF" {
+					return nil, errors.New("invalid fit")
+				}
+				cmd.fit = value
+			case "-path":
+				if value == "" {
+					return nil, errors.New("invalid path")
+				}
+				cmd.path = value
+			case "-type":
+				value = strings.ToUpper(value)
+				if value != "P" && value != "E" && value != "L" {
+					return nil, errors.New("invalid type")
+				}
+				cmd.type_ = value
+			case "-name":
+				if value == "" {
+					return nil, errors.New("invalid name")
+				}
+				cmd.name = value
+			default:
+				return nil, fmt.Errorf("invalid argument: %s", key)
+
+		}
+	}
+
+	if cmd.Size == 0 {
+		return nil, errors.New("size is required")
+	}
+
+	if cmd.path == "" {
+		return nil, errors.New("path is required")
+	}
+
+	if cmd.unit == "" {
+		cmd.unit = "M"
+	}
+
+	if cmd.fit == "" {
+		cmd.fit = "FF"
+	}
+
+	if cmd.type_ == "" {
+		cmd.type_ = "P"
+	}
+
+	if cmd.name == "" {
+		return nil, errors.New("name is required")
+	}
+
+	err := commandFdisk(cmd)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return cmd, nil
+}
+
+func commandFdisk(fdisk *FDISK) error {
+	sizeBytes, err := utils.ConvertToBytes(fdisk.Size, fdisk.unit) // convert the size to bytes
+	if err != nil {
+		fmt.Println("error converting size to bytes:", err)
+		return err
+	}
+
+	if fdisk.type_ == "P" {
+		err = createPrimaryPartition(fdisk, sizeBytes)
+		if err != nil {
+			fmt.Println("error creating primary partition:", err)
+			return err
+		}
+	} else if fdisk.type_ == "E" {
+		fmt.Println("extended partition")	
+		/* err = createExtendedPartition(fdisk, sizeBytes)
+		if err != nil {
+			fmt.Println("error creating extended partition:", err)
+			return err
+		} */
+	} else if fdisk.type_ == "L" {
+		fmt.Println("logical partition")
+		 /* err = createLogicalPartition(fdisk, sizeBytes)
+		if err != nil {
+			fmt.Println("error creating logical partition:", err)
+			return err
+		} */
+	}
+
+	return nil
+}
+
+func createPrimaryPartition(fdisk *FDISK, sizeBytes int) error {
+	var mbr structures.MBR // create the MBR struct
+
+	err := mbr.DeserializeMBR(fdisk.path) // read the MBR
+	if err != nil {
+		fmt.Println("error reading MBR:", err)
+		return err
+	}
+
+	fmt.Println("MBR before creating primary partition")
+	mbr.PrintMBR()
+
+	// Get the first free partition
+	availablePartition, startPartition, index := mbr.GetFreePartition()
+	if availablePartition == nil {
+		fmt.Println("no available partition")
+		return errors.New("no available partition")
+	}
+
+	fmt.Println("Available partition")
+	availablePartition.PrintPartition()
+
+	availablePartition.CreatePartition(startPartition, sizeBytes, fdisk.type_, fdisk.fit, fdisk.name)
+
+	fmt.Println("MBR after creating primary partition")
+	availablePartition.PrintPartition()	
+
+	if availablePartition != nil {
+		mbr.Mbr_partitions[index] = *availablePartition // update the partition
+	}
+
+	// Print the partitions
+	fmt.Println("\nParticiones del MBR:")
+	mbr.PrintPartitions()
+
+	err = mbr.SerializeMBR(fdisk.path) // serialize the MBR
+	if err != nil {
+		fmt.Println("error serializing MBR", err)
+	}
+
+	return nil
+}
