@@ -30,6 +30,8 @@ func Analyzer(input string) (interface{}, error) {
 		return commands.ParseMkfs(tokens[1:])
 	case "rep":
 		return commands.ParseRep(tokens[1:])
+	case "mounted":
+		return commands.ParseMounted(tokens[1:])
 	default:
 		return nil, fmt.Errorf("comando desconocido: %s", tokens[0])
 	}

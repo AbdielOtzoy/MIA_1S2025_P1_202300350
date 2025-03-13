@@ -102,6 +102,17 @@ func commandRep(rep *REP) error {
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+	case "bm_block":
+		err = reports.ReportBMBlock(mountedSb, mountedDiskPath, rep.path)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+	case "sb":
+		err = reports.ReportSuperBlock(mountedSb, rep.path)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+
 	}
 
 	return nil

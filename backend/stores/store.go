@@ -59,3 +59,10 @@ func GetMountedPartitionRep(id string) (*structures.MBR, *structures.SuperBlock,
 
 	return &mbr, &sb, path, nil
 }
+
+// print the mounted partitions id
+func PrintMountedPartitions() {
+	for id, path := range MountedPartitions {
+		println("id:", id, "path:", path)
+	}
+}

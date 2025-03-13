@@ -1,41 +1,23 @@
 digraph G {
-        node [shape=plaintext]
-        tabla [label=<
-            <table border="0" cellborder="1" cellspacing="0">
-                <tr><td colspan="2"> REPORTE MBR </td></tr>
-                <tr><td>mbr_tamano</td><td>1048576</td></tr>
-                <tr><td>mrb_fecha_creacion</td><td>2025-03-12 12:22:56 -0600 CST</td></tr>
-                <tr><td>mbr_disk_signature</td><td>910690359</td></tr>
-            
-				<tr><td colspan="2"> PARTICIÓN 1 </td></tr>
-				<tr><td>part_status</td><td>0</td></tr>
-				<tr><td>part_type</td><td>P</td></tr>
-				<tr><td>part_fit</td><td>B</td></tr>
-				<tr><td>part_start</td><td>153</td></tr>
-				<tr><td>part_size</td><td>1048576</td></tr>
-				<tr><td>part_name</td><td>Particion1</td></tr>
-			
-				<tr><td colspan="2"> PARTICIÓN 2 </td></tr>
-				<tr><td>part_status</td><td>1</td></tr>
-				<tr><td>part_type</td><td>P</td></tr>
-				<tr><td>part_fit</td><td>F</td></tr>
-				<tr><td>part_start</td><td>188</td></tr>
-				<tr><td>part_size</td><td>2097152</td></tr>
-				<tr><td>part_name</td><td>Particion2</td></tr>
-			
-				<tr><td colspan="2"> PARTICIÓN 3 </td></tr>
-				<tr><td>part_status</td><td>N</td></tr>
-				<tr><td>part_type</td><td>N</td></tr>
-				<tr><td>part_fit</td><td>N</td></tr>
-				<tr><td>part_start</td><td>-1</td></tr>
-				<tr><td>part_size</td><td>-1</td></tr>
-				<tr><td>part_name</td><td>N</td></tr>
-			
-				<tr><td colspan="2"> PARTICIÓN 4 </td></tr>
-				<tr><td>part_status</td><td>N</td></tr>
-				<tr><td>part_type</td><td>N</td></tr>
-				<tr><td>part_fit</td><td>N</td></tr>
-				<tr><td>part_start</td><td>-1</td></tr>
-				<tr><td>part_size</td><td>-1</td></tr>
-				<tr><td>part_name</td><td>N</td></tr>
+		node [shape=plaintext]
+		tabla [label=<
+			<table border="0" cellborder="1" cellspacing="0">
+				<tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE SUPER BLOQUE</b></font></td></tr>
+				<tr><td bgcolor="lightgray"><b>s_filesystem_type</b></td><td>%!s(int32=2)</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inodes_count</b></td><td>2</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_blocks_count</b></td><td>2</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_free_blocks_count</b></td><td>22150</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_free_inodes_count</b></td><td>7382</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_mtime</b></td><td>2025-03-13T07:49:52-06:00</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_umtime</b></td><td>2025-03-13T07:49:52-06:00</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_mnt_count</b></td><td>1</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_magic</b></td><td>61267</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inode_size</b></td><td>88</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_block_size</b></td><td>64</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_first_ino</b></td><td>30003</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_first_blo</b></td><td>679747</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_bm_inode_start</b></td><td>291</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_bm_block_start</b></td><td>7675</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inode_start</b></td><td>29827</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_block_start</b></td><td>679619</td></tr>
 			</table>>] }

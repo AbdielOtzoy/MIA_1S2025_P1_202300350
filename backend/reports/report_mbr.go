@@ -23,33 +23,26 @@ func ReportMBR(mbr *structures.MBR, path string) error {
         node [shape=plaintext]
         tabla [label=<
             <table border="0" cellborder="1" cellspacing="0">
-                <tr><td colspan="2"> REPORTE MBR </td></tr>
-                <tr><td>mbr_tamano</td><td>%d</td></tr>
-                <tr><td>mrb_fecha_creacion</td><td>%s</td></tr>
-                <tr><td>mbr_disk_signature</td><td>%d</td></tr>
+                <tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE MBR</b></font></td></tr>
+                <tr><td bgcolor="lightgray"><b>mbr_tamano</b></td><td>%d</td></tr>
+                <tr><td bgcolor="lightgray"><b>mbr_fecha_creacion</b></td><td>%s</td></tr>
+                <tr><td bgcolor="lightgray"><b>mbr_disk_signature</b></td><td>%d</td></tr>
             `, mbr.Mbr_size, time.Unix(int64(mbr.Mbr_creation_date), 0), mbr.Mbr_disk_signature)
 
 	for i, part := range mbr.Mbr_partitions {
-		/*
-			// Continuar si el tamaño de la partición es -1 (o sea, no está asignada)
-			if part.Part_size == -1 {
-				continue
-			}
-		*/
-
 		partName := strings.TrimRight(string(part.Part_name[:]), "\x00")
 		partStatus := rune(part.Part_status[0])
 		partType := rune(part.Part_type[0])
 		partFit := rune(part.Part_fit[0])
 
 		dotContent += fmt.Sprintf(`
-				<tr><td colspan="2"> PARTICIÓN %d </td></tr>
-				<tr><td>part_status</td><td>%c</td></tr>
-				<tr><td>part_type</td><td>%c</td></tr>
-				<tr><td>part_fit</td><td>%c</td></tr>
-				<tr><td>part_start</td><td>%d</td></tr>
-				<tr><td>part_size</td><td>%d</td></tr>
-				<tr><td>part_name</td><td>%s</td></tr>
+				<tr><td colspan="2" bgcolor="yellow"><b>PARTICIÓN %d</b></td></tr>
+				<tr><td bgcolor="lightblue"><b>part_status</b></td><td>%c</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_type</b></td><td>%c</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_fit</b></td><td>%c</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_start</b></td><td>%d</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_size</b></td><td>%d</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>%s</td></tr>
 			`, i+1, partStatus, partType, partFit, part.Part_start, part.Part_size, partName)
 	}
 
