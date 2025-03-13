@@ -109,6 +109,17 @@ func (mbr *MBR) GetPartitionByID(id string) (*Partition, error) {
 	return nil, fmt.Errorf("partition with ID %s not found", id)
 }
 
+// GetExtendedPartition
+func (mbr *MBR) GetExtendedPartition() (*Partition, int) {
+	for i, partition := range mbr.Mbr_partitions {
+		if partition.Part_type[0] == 'E' {
+			return &partition, i
+		}
+	}
+
+	return nil, -1
+}
+
 // print the values of the MBR struct
 func (mbr *MBR) PrintMBR() {
 	creationTime := time.Unix(int64(mbr.Mbr_creation_date), 0) // convert to time.Time

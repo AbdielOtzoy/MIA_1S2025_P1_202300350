@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+const EBRSize = 32
+
 type EBR struct {
 	Ebr_part_mount [1]byte // if the partition is mounted
 	Ebr_part_fit  [1]byte // fit type: B, F, W
@@ -16,7 +18,7 @@ type EBR struct {
 	Ebr_part_name [16]byte // name of the partition
 }
 
-func(ebr *EBR) SerializeEBR(path string) error {
+func(ebr *EBR) SerializeEBR(path string, offset int64) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return err
@@ -24,36 +26,49 @@ func(ebr *EBR) SerializeEBR(path string) error {
 
 	defer file.Close()
 
+	// Move the file pointer to the specified offset
+	_, err = file.Seek(offset, 0)
+	if err != nil {
+		return err
+	}
+
+	// Serialize the ebr structure directly into the file
 	err = binary.Write(file, binary.LittleEndian, ebr)
 	if err != nil {
-		return err 
+		return err
 	}
 
 	return nil
 }
 
-func(ebr *EBR) DeserializeEBR(path string) error {
+func(ebr *EBR) DeserializeEBR(path string, offset int64) error {
+	// Open the file for reading
 	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
-
 	defer file.Close()
 
-	// get the size of the ebr struct
-	ebrSize := binary.Size(ebr)
-	if ebrSize <= 0 {
-		return fmt.Errorf("invalid size of ebr struct: %d", ebrSize)
+	// Move the file pointer to the specified offset
+	_, err = file.Seek(offset, 0)
+	if err != nil {
+		return err
 	}
 
-	// read the number of bytes of the ebr struct
+	// Get the size of the ebr structure
+	ebrSize := binary.Size(ebr)
+	if ebrSize <= 0 {
+		return fmt.Errorf("invalid ebr size: %d", ebrSize)
+	}
+
+	// Read only the number of bytes corresponding to the size of the Inode structure
 	buffer := make([]byte, ebrSize)
 	_, err = file.Read(buffer)
 	if err != nil {
 		return err
 	}
 
-	// Deserialize the ebr struct
+	// Deserialize the read bytes into the Inode structure
 	reader := bytes.NewReader(buffer)
 	err = binary.Read(reader, binary.LittleEndian, ebr)
 	if err != nil {
@@ -62,6 +77,7 @@ func(ebr *EBR) DeserializeEBR(path string) error {
 
 	return nil
 }
+
 
 func(ebr *EBR) PrintEBR() {
 	partMount := rune(ebr.Ebr_part_mount[0])

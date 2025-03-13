@@ -128,18 +128,18 @@ func commandFdisk(fdisk *FDISK) error {
 		}
 	} else if fdisk.type_ == "E" {
 		fmt.Println("extended partition")	
-		/* err = createExtendedPartition(fdisk, sizeBytes)
+		err = createExtendedPartition(fdisk, sizeBytes)
 		if err != nil {
 			fmt.Println("error creating extended partition:", err)
 			return err
-		} */
+		} 
 	} else if fdisk.type_ == "L" {
 		fmt.Println("logical partition")
-		 /* err = createLogicalPartition(fdisk, sizeBytes)
+		 err = createLogicalPartition(fdisk, sizeBytes)
 		if err != nil {
 			fmt.Println("error creating logical partition:", err)
 			return err
-		} */
+		} 
 	}
 
 	return nil
@@ -186,4 +186,143 @@ func createPrimaryPartition(fdisk *FDISK, sizeBytes int) error {
 	}
 
 	return nil
+}
+
+func createExtendedPartition(fdisk *FDISK, sizeBytes int) error {
+	var mbr structures.MBR
+
+	err := mbr.DeserializeMBR(fdisk.path)
+	if err != nil {
+		fmt.Println("error reading MBR:", err)
+	}
+
+	fmt.Println("MBR before creating extended partition")
+	mbr.PrintMBR()
+
+	availablePartition, startPartition, index := mbr.GetFreePartition()
+	if availablePartition == nil {
+		fmt.Println("no available partition")
+		return errors.New("no available partition")
+	}
+
+	fmt.Println("Available partition")
+	availablePartition.PrintPartition()
+
+	availablePartition.CreatePartition(startPartition, sizeBytes, fdisk.type_, fdisk.fit, fdisk.name)
+
+	fmt.Println("MBR after creating extended partition")
+	availablePartition.PrintPartition()
+
+	if availablePartition != nil {
+		mbr.Mbr_partitions[index] = *availablePartition
+	}
+
+	ebr := &structures.EBR{
+		Ebr_part_mount: [1]byte{'N'},
+		Ebr_part_fit:   [1]byte{fdisk.fit[0]},
+		Ebr_part_start: int32(startPartition + structures.EBRSize),
+		Ebr_part_size:  -1,
+		Ebr_part_next:  -1,
+		Ebr_part_name:  [16]byte{},
+	}
+	copy(ebr.Ebr_part_name[:], fdisk.name)
+	fmt.Println("EBR has been created")
+	ebr.PrintEBR()
+
+	err = ebr.SerializeEBR(fdisk.path, int64(startPartition))
+	if err != nil {
+		fmt.Println("error serializing EBR:", err)
+	}
+
+	fmt.Println("\nParticiones del MBR:")	
+	mbr.PrintPartitions()
+
+	err = mbr.SerializeMBR(fdisk.path)
+	if err != nil {
+		fmt.Println("error serializing MBR", err)
+	}
+
+
+	if err != nil {
+		fmt.Println("error creating EBR:", err)
+	}
+
+	return nil
+}
+
+func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
+	// 1. Read the MBR
+	var mbr structures.MBR
+
+	err := mbr.DeserializeMBR(fdisk.path)
+	if err != nil {
+		fmt.Println("error reading MBR:", err)
+	}
+
+	fmt.Println("MBR before creating logical partition")
+	mbr.PrintMBR()
+
+	// 2. Get the extended partition, if not exists return an error
+	extendedPartition, _ := mbr.GetExtendedPartition()
+
+	if extendedPartition == nil {
+		fmt.Println("no extended partition")
+		return errors.New("no extended partition")
+	}
+
+	fmt.Println("Extended partition")
+	extendedPartition.PrintPartition()
+
+	// Get the last EBR
+	lastEBR, err := extendedPartition.GetLastEBR(fdisk.path)
+	if err != nil {
+		fmt.Println("error getting last EBR:", err)
+		return err
+	}
+
+	// create the new EBR
+	newEbr := &structures.EBR{
+		Ebr_part_mount: [1]byte{'N'},
+		Ebr_part_fit:   [1]byte{fdisk.fit[0]},
+		Ebr_part_start: int32(lastEBR.Ebr_part_start + structures.EBRSize + int32(logicalSize)),
+		Ebr_part_size:  -1,
+		Ebr_part_next:  -1,
+		Ebr_part_name:  [16]byte{},
+	}
+
+	copy(newEbr.Ebr_part_name[:], fdisk.name)
+
+	fmt.Println("New EBR")
+	newEbr.PrintEBR()
+
+	// Serialize the new EBR
+	err = newEbr.SerializeEBR(fdisk.path, int64(lastEBR.Ebr_part_start))
+	if err != nil {
+		fmt.Println("error serializing EBR:", err)
+		return err
+	}
+
+	// Update the last EBR
+	lastEBR.Ebr_part_next = newEbr.Ebr_part_start
+	fmt.Println("Last EBR")
+	lastEBR.PrintEBR()
+	err = lastEBR.SerializeEBR(fdisk.path, int64(lastEBR.Ebr_part_start))
+	if err != nil {
+		fmt.Println("error serializing last EBR:", err)
+		return err
+	}
+
+	// Print the partitions
+	fmt.Println("\nParticiones del MBR:")
+
+	mbr.PrintPartitions()
+
+	// Serialize the MBR
+	err = mbr.SerializeMBR(fdisk.path)
+	if err != nil {
+		fmt.Println("error serializing MBR:", err)
+	}
+
+	return nil
+
 }

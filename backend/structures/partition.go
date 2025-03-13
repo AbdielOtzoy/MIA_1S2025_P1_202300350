@@ -39,6 +39,30 @@ func (p *Partition) MountPartition(correlative int, id string) error {
 	return nil
 }
 
+// GetLastEBR returns the last EBR in the linked list
+func (p *Partition) GetLastEBR(path string) (*EBR, error) {
+	var ebr EBR
+	// get the first EBR, which is the start of the linked list
+	err := ebr.DeserializeEBR(path, int64(p.Part_start))
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("First EBR")
+	ebr.PrintEBR()
+
+	// iterate over the linked list to get the last EBR
+	for ebr.Ebr_part_next != -1 {
+		err = ebr.DeserializeEBR(path, int64(ebr.Ebr_part_next))
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Next EBR")
+		ebr.PrintEBR()
+	}
+
+	return &ebr, nil
+}
+
 func (p *Partition) PrintPartition() {
 	partStatus := rune(p.Part_status[0])
 	partType := rune(p.Part_type[0])
