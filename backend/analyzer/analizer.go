@@ -16,8 +16,6 @@ func Analyzer(input string) (interface{}, error) {
 	}
 
 	switch tokens[0] {
-	case "mkdir":
-		return ParseMkdir(tokens[1:])
 	case "mkdisk":
 		return commands.ParseMkdisk(tokens[1:])
 	case "rmdisk":
@@ -32,6 +30,12 @@ func Analyzer(input string) (interface{}, error) {
 		return commands.ParseRep(tokens[1:])
 	case "mounted":
 		return commands.ParseMounted(tokens[1:])
+	case "mkdir":
+		return commands.ParseMkdir(tokens[1:])
+	case "mkfile":
+		return commands.ParseMKfile(tokens[1:])
+	case "cat":
+		return commands.ParseCat(tokens[1:])
 	default:
 		return nil, fmt.Errorf("comando desconocido: %s", tokens[0])
 	}

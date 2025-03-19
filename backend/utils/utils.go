@@ -24,6 +24,19 @@ func ConvertToBytes(size int, unit string) (int, error) {
 	}
 }
 
+// converting a string to an int
+func StringToInt(s string) int {
+	var result int
+	for _, char := range s {
+		if char >= '0' && char <= '9' {
+			result = result*10 + int(char-'0')
+		} else {
+			return 0
+		}
+	}
+	return result
+}
+
 // alphabet array
 var alphabet =	[]string{
 	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
@@ -69,4 +82,74 @@ func GetFileNames(path string) (string, string) {
 	dotFileName := filepath.Join(dir, baseName+".dot")
 	outputImage := path
 	return dotFileName, outputImage
+}
+
+func GetParentDirectories(path string) ([]string, string) {
+	path = filepath.Clean(path)
+
+	components := strings.Split(path, string(filepath.Separator))
+
+	var parentDirs []string
+
+	for i := 1; i < len(components)-1; i++ {
+		parentDirs = append(parentDirs, components[i])
+	}
+	destDir := components[len(components)-1]
+
+	return parentDirs, destDir
+}
+
+func First[T any](slice []T) (T, error) {
+	if len(slice) == 0 {
+		var zero T
+		return zero, errors.New("el slice está vacío")
+	}
+	return slice[0], nil
+}
+
+func RemoveElement[T any](slice []T, index int) []T {
+	if index < 0 || index >= len(slice) {
+		return slice 
+	}
+	return append(slice[:index], slice[index+1:]...)
+}
+
+// splitStringIntoChunks divide una cadena en partes de tamaño chunkSize y las almacena en una lista
+func SplitStringIntoChunks(s string) []string {
+	var chunks []string
+	for i := 0; i < len(s); i += 64 {
+		end := i + 64
+		if end > len(s) {
+			end = len(s)
+		}
+		chunks = append(chunks, s[i:end])
+	}
+	return chunks
+}
+
+func GetFileContent(path string) (string, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("error al leer el archivo: %w", err)
+	}
+	contentStr := string(content)
+	return contentStr, nil
+
+}
+
+func SplitPath(path string) []string {
+	components := strings.Split(path, "/")
+
+	var result []string
+
+	currentPath := ""
+	for _, component := range components {
+		if component == "" {
+			continue
+		}
+		currentPath += "/" + component
+		result = append(result, currentPath)
+	}
+	// retornar pero sin el ultimo elemento ya que solo se verifica que existan las carpetas padre
+	return result[:len(result)-1]
 }

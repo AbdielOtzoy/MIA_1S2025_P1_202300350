@@ -1,0 +1,23 @@
+digraph G {
+		node [shape=plaintext]
+		tabla [label=<
+			<table border="0" cellborder="1" cellspacing="0">
+				<tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE SUPER BLOQUE</b></font></td></tr>
+				<tr><td bgcolor="lightgray"><b>s_filesystem_type</b></td><td>%!s(int32=2)</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inodes_count</b></td><td>3</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_blocks_count</b></td><td>3</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_free_blocks_count</b></td><td>22149</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_free_inodes_count</b></td><td>7381</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_mtime</b></td><td>2025-03-17T10:14:56-06:00</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_umtime</b></td><td>2025-03-17T10:14:56-06:00</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_mnt_count</b></td><td>1</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_magic</b></td><td>61267</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inode_size</b></td><td>88</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_block_size</b></td><td>64</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_first_ino</b></td><td>30056</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_first_blo</b></td><td>679776</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_bm_inode_start</b></td><td>256</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_bm_block_start</b></td><td>7640</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_inode_start</b></td><td>29792</td></tr>
+				<tr><td bgcolor="lightgray"><b>s_block_start</b></td><td>679584</td></tr>
+			</table>>] }

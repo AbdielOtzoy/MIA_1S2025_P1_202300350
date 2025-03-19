@@ -95,180 +95,6 @@ func (sb *SuperBlock) Deserialize(path string, offset int64) error {
 	return nil
 }
 
-// CreateUsersFile initializes the filesystem by creating the root directory and the users.txt file.
-// This function sets up the basic structure of the filesystem.
-func (sb *SuperBlock) CreateUsersFile(path string) error {
-	// ----------- Create the root directory -----------
-	// Create the root inode
-	rootInode := &Inode{
-		I_uid:   1,
-		I_gid:   1,
-		I_size:  0,
-		I_atime: float32(time.Now().Unix()),
-		I_ctime: float32(time.Now().Unix()),
-		I_mtime: float32(time.Now().Unix()),
-		I_block: [15]int32{sb.S_blocks_count, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-		I_type:  [1]byte{'0'},
-		I_perm:  [3]byte{'7', '7', '7'},
-	}
-
-	// Serialize the root inode
-	err := rootInode.Serialize(path, int64(sb.S_first_ino))
-	if err != nil {
-		return err
-	}
-
-	// Update the inode bitmap
-	err = sb.UpdateBitmapInode(path)
-	if err != nil {
-		return err
-	}
-
-	// Update the superblock
-	sb.S_inodes_count++
-	sb.S_free_inodes_count--
-	sb.S_first_ino += sb.S_inode_size
-
-	// Create the root directory block
-	rootBlock := &FolderBlock{
-		B_content: [4]FolderContent{
-			{B_name: [12]byte{'.'}, B_inodo: 0},
-			{B_name: [12]byte{'.', '.'}, B_inodo: 0},
-			{B_name: [12]byte{'-'}, B_inodo: -1},
-			{B_name: [12]byte{'-'}, B_inodo: -1},
-		},
-	}
-
-	// Update the block bitmap
-	err = sb.UpdateBitmapBlock(path)
-	if err != nil {
-		return err
-	}
-
-	// Serialize the root directory block
-	err = rootBlock.Serialize(path, int64(sb.S_first_blo))
-	if err != nil {
-		return err
-	}
-
-	// Update the superblock
-	sb.S_blocks_count++
-	sb.S_free_blocks_count--
-	sb.S_first_blo += sb.S_block_size
-
-	// Print the root inode
-	fmt.Println("\nRoot Inode:")
-	rootInode.Print()
-
-	// Print the root directory block
-	fmt.Println("\nRoot Directory Block:")
-	rootBlock.Print()
-
-	// ----------- Create /users.txt -----------
-	usersText := "1,G,root\n1,U,root,123\n"
-
-	// Deserialize the root inode
-	err = rootInode.Deserialize(path, int64(sb.S_inode_start+0)) // 0 because it's the root inode
-	if err != nil {
-		return err
-	}
-
-	// Update the root inode's access time
-	rootInode.I_atime = float32(time.Now().Unix())
-
-	// Serialize the root inode
-	err = rootInode.Serialize(path, int64(sb.S_inode_start+0)) // 0 because it's the root inode
-	if err != nil {
-		return err
-	}
-
-	// Deserialize the root directory block
-	err = rootBlock.Deserialize(path, int64(sb.S_block_start+0)) // 0 because it's the root directory block
-	if err != nil {
-		return err
-	}
-
-	// Update the root directory block to include the users.txt entry
-	rootBlock.B_content[2] = FolderContent{B_name: [12]byte{'u', 's', 'e', 'r', 's', '.', 't', 'x', 't'}, B_inodo: sb.S_inodes_count}
-
-	// Serialize the root directory block
-	err = rootBlock.Serialize(path, int64(sb.S_block_start+0)) // 0 because it's the root directory block
-	if err != nil {
-		return err
-	}
-
-	// Create the users.txt inode
-	usersInode := &Inode{
-		I_uid:   1,
-		I_gid:   1,
-		I_size:  int32(len(usersText)),
-		I_atime: float32(time.Now().Unix()),
-		I_ctime: float32(time.Now().Unix()),
-		I_mtime: float32(time.Now().Unix()),
-		I_block: [15]int32{sb.S_blocks_count, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-		I_type:  [1]byte{'1'},
-		I_perm:  [3]byte{'7', '7', '7'},
-	}
-
-	// Update the inode bitmap
-	err = sb.UpdateBitmapInode(path)
-	if err != nil {
-		return err
-	}
-
-	// Serialize the users.txt inode
-	err = usersInode.Serialize(path, int64(sb.S_first_ino))
-	if err != nil {
-		return err
-	}
-
-	// Update the superblock
-	sb.S_inodes_count++
-	sb.S_free_inodes_count--
-	sb.S_first_ino += sb.S_inode_size
-
-	// Create the users.txt block
-	usersBlock := &FileBlock{
-		B_content: [64]byte{},
-	}
-	// Copy the users text into the block
-	copy(usersBlock.B_content[:], usersText)
-
-	// Serialize the users.txt block
-	err = usersBlock.Serialize(path, int64(sb.S_first_blo))
-	if err != nil {
-		return err
-	}
-
-	// Update the block bitmap
-	err = sb.UpdateBitmapBlock(path)
-	if err != nil {
-		return err
-	}
-
-	// Update the superblock
-	sb.S_blocks_count++
-	sb.S_free_blocks_count--
-	sb.S_first_blo += sb.S_block_size
-
-	// Print the updated root inode
-	fmt.Println("\nUpdated Root Inode:")
-	rootInode.Print()
-
-	// Print the updated root directory block
-	fmt.Println("\nUpdated Root Directory Block:")
-	rootBlock.Print()
-
-	// Print the users.txt inode
-	fmt.Println("\nUsers.txt Inode:")
-	usersInode.Print()
-
-	// Print the users.txt block
-	fmt.Println("\nUsers.txt Block:")
-	usersBlock.Print()
-
-	return nil
-}
 
 // PrintSuperBlock displays the values of the SuperBlock structure in a human-readable format.
 // This function is used for debugging and visualization purposes.
@@ -364,5 +190,57 @@ func (sb *SuperBlock) PrintBlocks(path string) error {
 		}
 	}
 
+	return nil
+}
+
+// CreateFolder crea una carpeta en el sistema de archivos
+func (sb *SuperBlock) CreateFolder(path string, parentsDir []string, destDir string) error {
+	if len(parentsDir) == 0 {
+		return sb.createFolderInInode(path, 0, parentsDir, destDir)
+	}
+
+	for i := int32(0); i < sb.S_inodes_count; i++ {
+		err := sb.createFolderInInode(path, i, parentsDir, destDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// CreateFile crea un archivo en el sistema de archivos
+func (sb *SuperBlock) CreateFile(path string, parentsDir []string, destDir string, r bool, size int, content string) error {
+	if len(parentsDir) == 0 {
+		return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content)
+	}
+
+	for i := int32(0); i < sb.S_inodes_count; i++ {
+		err := sb.createFileInode(path, i, parentsDir, destDir, r, size, content)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (sb *SuperBlock) ExistsFolcer(path string, parentsDir []string, destDir string) (bool, error) {
+	exists, err := sb.folderExists(path, 0, parentsDir, destDir)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+
+}
+
+// ReadFile lee el contenido de un archivo en el sistema de archivos
+func (sb *SuperBlock) ReadFile(path string, parentsDir []string, destDir string) error {
+	content, err := sb.readFileInInode(path, 0, parentsDir, destDir)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Contenido del archivo:", content)
 	return nil
 }
