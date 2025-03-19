@@ -1,0 +1,11 @@
+digraph G {
+        rankdir=LR; // Alineación horizontal
+        node [shape=plaintext]
+    file [label=<
+		<table border="0" cellborder="1" cellspacing="0">
+			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>ARCHIVO users.txt</b></font></td></tr>
+			<tr><td bgcolor="lightgray"><b>Contenido</b></td><td>1,G,root
+1,U,root,123</td></tr>
+		</table>
+	>]
+	}

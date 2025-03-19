@@ -83,16 +83,10 @@ func commandCat(cmd *CAT) error {
 		fmt.Println("Parent dirs: ", parentDirs)
 		fmt.Println("Dest dir: ", destDir)
 
-		err = sb.ReadFile(partitionPath, parentDirs, destDir)
+		_, err := sb.ReadFile(partitionPath, parentDirs, destDir)
 		if err != nil {
 			return fmt.Errorf("error al leer el archivo: %w", err)
 		}
-
-		// fmt.Println("Contenido del archivo: ", content)
-		// fmt.Println("Contenido del archivo: ", string(content))
-
-		// fmt.Println("Contenido del archivo: ", string(content))
-		// fmt.Println("Contenido del archivo: ", string(content))
 	}
 	return nil
 

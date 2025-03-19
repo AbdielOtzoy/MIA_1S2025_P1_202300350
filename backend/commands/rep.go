@@ -112,6 +112,11 @@ func commandRep(rep *REP) error {
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+	case "file":
+		err = reports.ReportFile(mountedSb, mountedDiskPath,rep.path, rep.path_file_ls)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
 	case "sb":
 		err = reports.ReportSuperBlock(mountedSb, rep.path)
 		if err != nil {

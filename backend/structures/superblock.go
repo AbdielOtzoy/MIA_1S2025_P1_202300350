@@ -236,11 +236,11 @@ func (sb *SuperBlock) ExistsFolcer(path string, parentsDir []string, destDir str
 }
 
 // ReadFile lee el contenido de un archivo en el sistema de archivos
-func (sb *SuperBlock) ReadFile(path string, parentsDir []string, destDir string) error {
+func (sb *SuperBlock) ReadFile(path string, parentsDir []string, destDir string) (string, error) {
 	content, err := sb.readFileInInode(path, 0, parentsDir, destDir)
 	if err != nil {
-		return err
+		return "", err
 	}
 	fmt.Println("Contenido del archivo:", content)
-	return nil
+	return content, nil
 }
