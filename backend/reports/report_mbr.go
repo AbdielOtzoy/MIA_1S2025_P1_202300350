@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func ReportMBR(mbr *structures.MBR, path string) error {
+func ReportMBR(mbr *structures.MBR, diskPath string, path string) error {
 	// Crear las carpetas padre si no existen
 	err := utils.CreateParentDirs(path)
 	if err != nil {
@@ -44,6 +44,24 @@ func ReportMBR(mbr *structures.MBR, path string) error {
 				<tr><td bgcolor="lightblue"><b>part_size</b></td><td>%d</td></tr>
 				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>%s</td></tr>
 			`, i+1, partStatus, partType, partFit, part.Part_start, part.Part_size, partName)
+
+		if partType== 'e' {
+			ebr := structures.EBR{}
+			err := ebr.DeserializeEBR(diskPath, int64(part.Part_start))
+			if err != nil {
+				return fmt.Errorf("error al deserializar el EBR: %v", err)
+			}
+
+			ebr.PrintEBR()
+			
+			// path: "/home/abdielo/dev/archivos/proyecto1/backend/output/report_mbr.png"
+			// ebrPath := "/home/abdielo/dev/archivos/proyecto1/backend/output/ebr_index.png"
+			ebrPath := fmt.Sprintf("%s/ebr_%d.png", path, i+1)
+			fmt.Println("EBR Path:", ebrPath)
+			ebrDotFileName, _ := utils.GetFileNames(ebrPath)
+			fmt.Println("EBR Dot File Name:", ebrDotFileName)
+			ReportEBR(&ebr, ebrDotFileName)
+		}
 	}
 
 	dotContent += "</table>>] }"

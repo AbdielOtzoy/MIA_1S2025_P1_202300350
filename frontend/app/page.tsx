@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Terminal from "../components/Terminal";
-import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
 import api from "@/lib/api";
+import FileUpload from "@/components/FileUpload";
+import { Button } from "@/components/ui/button";
 
 export default function FileSystemSimulator() {
   const [inputContent, setInputContent] = useState<string[]>([""]);
@@ -19,7 +19,7 @@ export default function FileSystemSimulator() {
 
   // Función para manejar la ejecución de comandos
   const handleExecute = async (command: string) => {
-    if(command === "clear" || command === "cls") {
+    if (command === "clear" || command === "cls") {
       setOutputContent([]);
       setInputContent([""]);
       return;
@@ -31,8 +31,17 @@ export default function FileSystemSimulator() {
           command: command,
         });
 
-        // Mostrar el comando ejecutado y la respuesta del servidor
-        setOutputContent([...outputContent, `> ${command}`, response.data.message]);
+        const output = response.data.output;
+
+        // mostrar cada linea de salida
+        for (const line of output.split("\n")) {
+          setOutputContent((prev) => [...prev, line]);
+        }
+
+        // Añadir el comando ejecutado al contenido de salida
+        setOutputContent((prev) => [`> ${command}`, ...prev]);
+        // Añadir el resultado al contenido de salida
+
       } catch (error) {
         // Manejar errores de la petición
         setOutputContent([...outputContent, `> ${command}`, "Error: Could not execute command"]);
@@ -44,8 +53,14 @@ export default function FileSystemSimulator() {
     }
   };
 
-  const handleUpload = () => {
-    setOutputContent([...outputContent, "File uploaded successfully"]);
+  const handleUpload = (content: string) => {
+    console.log("Contenido del archivo subido:", content);
+    for (const line of content.split("\n")) {
+      setOutputContent((prev) => [...prev, line]);
+    }
+    setInputContent((prev) => [...prev, ""]);
+
+    handleExecute(content);
   };
 
   return (
@@ -59,13 +74,38 @@ export default function FileSystemSimulator() {
         contentOutput={outputContent}
         editable={true}
         onContentChange={handleContentChange}
-        onExecute={handleExecute} 
-        />
+        onExecute={handleExecute}
+      />
+
+      <div className="flex justify-center mb-4">
+        <label
+          htmlFor="file-upload"
+          className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 
+                       transition-colors duration-200 cursor-pointer shadow-sm
+                       flex items-center gap-2"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+            />
+          </svg>
+          Cargar Archivo
+        </label>
+        <Button variant="outline" className="ml-4" onClick={() => handleExecute(inputContent[inputContent.length - 1])}>
+          Ejecutar
+        </Button>
+      </div>
 
       <div className="flex justify-center space-x-4">
-        <Button onClick={handleUpload} className="bg-blue-500 hover:bg-blue-600">
-          <Upload className="mr-2 h-4 w-4" /> Upload File
-        </Button>
+        <FileUpload onFileContent={handleUpload} />
       </div>
     </div>
   );

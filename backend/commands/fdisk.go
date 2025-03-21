@@ -21,7 +21,7 @@ type FDISK struct {
 
 }
 
-func ParseFdisk(tokens []string) (*FDISK, error) {
+func ParseFdisk(tokens []string) (string, error) {
 	cmd := &FDISK{} // create the mkdisk command
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
@@ -33,7 +33,7 @@ func ParseFdisk(tokens []string) (*FDISK, error) {
 	for _, match := range matches {
 		kv := strings.SplitN(match, "=", 2) // split the match in key and value
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid argument: %s", match)
+			return "", fmt.Errorf("invalid argument: %s", match)
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -45,48 +45,48 @@ func ParseFdisk(tokens []string) (*FDISK, error) {
 			case "-size":
 				size, err := strconv.Atoi(value) // convert the value to integer
 				if err != nil || size <= 0 {
-					return nil, errors.New("invalid size")
+					return "", errors.New("invalid size")
 				}
 				cmd.Size = size
 			case "-unit":
 				if value != "K" && value != "M" {
-					return nil, errors.New("invalid unit")
+					return "", errors.New("invalid unit")
 				}
 				cmd.unit = strings.ToUpper(value)
 			case "-fit":
 				value = strings.ToUpper(value)
 				if value != "BF" && value != "FF" && value != "WF" {
-					return nil, errors.New("invalid fit")
+					return "", errors.New("invalid fit")
 				}
 				cmd.fit = value
 			case "-path":
 				if value == "" {
-					return nil, errors.New("invalid path")
+					return "", errors.New("invalid path")
 				}
 				cmd.path = value
 			case "-type":
 				value = strings.ToUpper(value)
 				if value != "P" && value != "E" && value != "L" {
-					return nil, errors.New("invalid type")
+					return "", errors.New("invalid type")
 				}
 				cmd.type_ = value
 			case "-name":
 				if value == "" {
-					return nil, errors.New("invalid name")
+					return "", errors.New("invalid name")
 				}
 				cmd.name = value
 			default:
-				return nil, fmt.Errorf("invalid argument: %s", key)
+				return "", fmt.Errorf("invalid argument: %s", key)
 
 		}
 	}
 
 	if cmd.Size == 0 {
-		return nil, errors.New("size is required")
+		return "", errors.New("size is required")
 	}
 
 	if cmd.path == "" {
-		return nil, errors.New("path is required")
+		return "", errors.New("path is required")
 	}
 
 	if cmd.unit == "" {
@@ -102,7 +102,7 @@ func ParseFdisk(tokens []string) (*FDISK, error) {
 	}
 
 	if cmd.name == "" {
-		return nil, errors.New("name is required")
+		return "", errors.New("name is required")
 	}
 
 	err := commandFdisk(cmd)
@@ -110,7 +110,7 @@ func ParseFdisk(tokens []string) (*FDISK, error) {
 		fmt.Println(err)
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("Partition %s created successfully", cmd.name), nil
 }
 
 func commandFdisk(fdisk *FDISK) error {

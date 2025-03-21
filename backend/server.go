@@ -3,11 +3,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors" // Importar el middleware de CORS
 	analyzer "backend/analyzer" // Importar el paquete analyzer
 )
+
+type CommandRequest struct {
+	Command string `json:"command"`
+}
+
+type CommandResponse struct {
+	Output string `json:"output"`
+}
 
 func main() {
 	// Crear una nueva instancia de Fiber
@@ -34,27 +43,35 @@ func main() {
 
 		// Parsear el cuerpo de la solicitud
 		if err := c.BodyParser(&requestBody); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "No se pudo procesar la solicitud",
+			return c.Status(400).JSON(CommandResponse{
+				Output: "Error: Petición inválida",
 			})
 		}
 
-		// Mostrar el comando recibido
-		fmt.Println("Comando recibido:", requestBody.Command)
+		commands := strings.Split(requestBody.Command, "\n")
+		output := ""
 
-		// analizar la entrada
-		cmd, err := analyzer.Analyzer(requestBody.Command)
-		if err != nil {
-			// Si hay un error al analizar el comando, imprime el error y continúa con el siguiente comando
-			fmt.Println("Error:", err)
+		for _, cmd := range commands {
+			if strings.TrimSpace(cmd) == "" {
+				continue
+			}
+
+			result, err := analyzer.Analyzer(cmd)
+			if err != nil {
+				output += fmt.Sprintf("Error: %s\n", err.Error())
+			} else {
+				output += fmt.Sprintf("%s\n", result)
+			}
 		}
-		// Comentado: Aquí podrías imprimir el comando analizado
-		fmt.Printf("Parsed Command: %+v\n", cmd)
 
-		// Responder con un mensaje de éxito
-		return c.JSON(fiber.Map{
-			"message": fmt.Sprintf("Comando ejecutado: %s", requestBody.Command),
+		if output == "" {
+			output = "No se ejecutó ningún comando"
+		}
+
+		return c.JSON(CommandResponse{
+			Output: output,
 		})
+
 	})
 
 	// Iniciar el servidor en el puerto 8000

@@ -24,6 +24,8 @@ func ConvertToBytes(size int, unit string) (int, error) {
 	}
 }
 
+
+
 // converting a string to an int
 func StringToInt(s string) int {
 	var result int

@@ -16,7 +16,7 @@ type REP struct {
 	path_file_ls 	string
 } 
 
-func ParseRep(tokens []string) (*REP, error) {
+func ParseRep(tokens []string) (string, error) {
 	cmd := &REP{}
 	
 	args := strings.Join(tokens, " ")
@@ -28,7 +28,7 @@ func ParseRep(tokens []string) (*REP, error) {
 	for _, match := range matches {
 		kv := strings.SplitN(match, "=", 2)
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid argument: %s", match)
+			return "", fmt.Errorf("invalid argument: %s", match)
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -39,36 +39,36 @@ func ParseRep(tokens []string) (*REP, error) {
 		switch key {
 			case "-id":
 				if value == "" {
-					return nil, errors.New("invalid id")
+					return "", errors.New("invalid id")
 				}
 				cmd.id = value
 			case "-path":
 				if value == "" {
-					return nil, errors.New("invalid path")
+					return "", errors.New("invalid path")
 				}
 				cmd.path = value
 			case "-name":
 				validNames := []string{"mbr", "disk", "inode", "block", "bm_inode", "bm_block", "sb", "file", "ls"}
 				if !contains(validNames, value) {
-					return nil, errors.New("nombre inválido, debe ser uno de los siguientes: mbr, disk, inode, block, bm_inode, bm_block, sb, file, ls")
+					return "", errors.New("nombre inválido, debe ser uno de los siguientes: mbr, disk, inode, block, bm_inode, bm_block, sb, file, ls")
 				}
 				cmd.name = value
 			case "-path_file_ls":
 				cmd.path_file_ls = value
 			default:
-				return nil, fmt.Errorf("invalid argument: %s", key)
+				return "", fmt.Errorf("invalid argument: %s", key)
 		}
 	}
 	if cmd.id == "" || cmd.path == "" || cmd.name == "" {
-		return nil, errors.New("faltan parámetros requeridos: -id, -path, -name")
+		return "", errors.New("faltan parámetros requeridos: -id, -path, -name")
 	}
 
-	err := commandRep(cmd)
+	message, err := commandRep(cmd)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("Se ha generado el reporte: %s", message), nil
 }
 
 func contains(list []string, value string) bool {
@@ -80,50 +80,57 @@ func contains(list []string, value string) bool {
 	return false
 }
 
-func commandRep(rep *REP) error {
+func commandRep(rep *REP) (string, error) {
 	mountedMbr, mountedSb, mountedDiskPath, err := stores.GetMountedPartitionRep(rep.id)
 	if err != nil {
-		return err
+		return "", fmt.Errorf("Error al obtener la partición montada: %v", err)
 	}
 
 	switch rep.name {
 	case "mbr":
-		err = reports.ReportMBR(mountedMbr, rep.path)
+		err = reports.ReportMBR(mountedMbr,mountedDiskPath, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("MBR report generated at %s", rep.path), nil
 	case "inode":
 		err = reports.ReportInode(mountedSb, mountedDiskPath, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("Inode report generated at %s", rep.path), nil
 	case "block":
 		err = reports.ReportBlock(mountedSb, mountedDiskPath, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("Block report generated at %s", rep.path), nil
 	case "bm_inode":
 		err = reports.ReportBMInode(mountedSb, mountedDiskPath, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("BM Inode report generated at %s", rep.path), nil
 	case "bm_block":
 		err = reports.ReportBMBlock(mountedSb, mountedDiskPath, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("BM Block report generated at %s", rep.path), nil
 	case "file":
 		err = reports.ReportFile(mountedSb, mountedDiskPath,rep.path, rep.path_file_ls)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("File report generated at %s", rep.path), nil
 	case "sb":
 		err = reports.ReportSuperBlock(mountedSb, rep.path)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+		return fmt.Sprintf("Superblock report generated at %s", rep.path), nil
 
 	}
 
-	return nil
+	return "", fmt.Errorf("Invalid report name: %s", rep.name)
 }

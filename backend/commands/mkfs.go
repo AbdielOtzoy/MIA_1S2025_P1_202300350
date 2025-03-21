@@ -17,7 +17,7 @@ type MKFS struct {
 	typ string
 }
 
-func ParseMkfs(tokens []string) (*MKFS, error) {
+func ParseMkfs(tokens []string) (string, error) {
 	cmd := &MKFS{}
 
 	args := strings.Join(tokens, " ")
@@ -27,7 +27,7 @@ func ParseMkfs(tokens []string) (*MKFS, error) {
 	for _, match := range matches {
 		kv := strings.SplitN(match, "=", 2)
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("formato de parámetro inválido: %s", match)
+			return "", fmt.Errorf("formato de parámetro inválido: %s", match)
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -38,21 +38,21 @@ func ParseMkfs(tokens []string) (*MKFS, error) {
 		switch key {
 		case "-id":
 			if value == "" {
-				return nil, errors.New("el id no puede estar vacío")
+				return "", errors.New("el id no puede estar vacío")
 			}
 			cmd.id = value
 		case "-type":
 			if value != "full" {
-				return nil, errors.New("el tipo debe ser full")
+				return "", errors.New("el tipo debe ser full")
 			}
 			cmd.typ = value
 		default:
-			return nil, fmt.Errorf("parámetro desconocido: %s", key)
+			return "", fmt.Errorf("parámetro desconocido: %s", key)
 		}
 	}
 
 	if cmd.id == "" {
-		return nil, errors.New("faltan parámetros requeridos: -id")
+		return "", errors.New("faltan parámetros requeridos: -id")
 	}
 
 	if cmd.typ == "" {
@@ -64,7 +64,7 @@ func ParseMkfs(tokens []string) (*MKFS, error) {
 		fmt.Println("Error:", err)
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("Se ha formateado la partición con id: %s", cmd.id), nil
 }
 
 func commandMkfs(mkfs *MKFS) error {

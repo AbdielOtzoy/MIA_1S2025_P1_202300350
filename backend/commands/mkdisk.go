@@ -21,7 +21,7 @@ type MKDISK struct {
 	path string
 }
 
-func ParseMkdisk(tokens []string) (*MKDISK, error) {
+func ParseMkdisk(tokens []string) (string, error) {
 	cmd := &MKDISK{} // create the mkdisk command
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
@@ -35,7 +35,7 @@ func ParseMkdisk(tokens []string) (*MKDISK, error) {
 		// dibide the argument in the key and value
 		kv := strings.SplitN(match, "=", 3)
 		if len(kv) != 2 {
-			return nil, errors.New("invalid argument")
+			return "", errors.New("invalid argument")
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -47,38 +47,38 @@ func ParseMkdisk(tokens []string) (*MKDISK, error) {
 			case "-size":
 				size, err := strconv.Atoi(value) // convert the value to integer
 				if err != nil {
-					return nil, errors.New("invalid size")
+					return "", errors.New("invalid size")
 				}
 				cmd.Size = size
 			case "-unit":
 				value = strings.ToUpper(value)
 				if value != "K" && value != "M" {
-					return nil, errors.New("invalid unit")
+					return "", errors.New("invalid unit")
 				}
 				cmd.unit = value
 			case "-fit":
 				value = strings.ToUpper(value)
 				if value != "FF" && value != "BF" && value != "WF" {
-					return nil, errors.New("invalid fit")
+					return "", errors.New("invalid fit")
 				}
 				cmd.fit = value
 			case "-path":
 				if value == "" {
-					return nil, errors.New("invalid path")
+					return "", errors.New("invalid path")
 				}
 				cmd.path = value
 			default: 
-				return nil, errors.New("invalid argument") // invalid argument
+				return "", errors.New("invalid argument") // invalid argument
 
 		}
 	}
 
 	if cmd.Size == 0 {
-		return nil, errors.New("size is required")
+		return "", errors.New("size is required")
 	}
 
 	if cmd.path == "" {
-		return nil, errors.New("path is required")
+		return "", errors.New("path is required")
 	}
 
 	if cmd.unit == "" {
@@ -94,7 +94,7 @@ func ParseMkdisk(tokens []string) (*MKDISK, error) {
 		fmt.Println(err)
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("Disk created with size %d%s, fit %s, and path %s", cmd.Size, cmd.unit, cmd.fit, cmd.path), nil
 }
 
 func commandMkdisk(mkdisk *MKDISK) error {

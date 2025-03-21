@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func Analyzer(input string) (interface{}, error) {
+func Analyzer(input string) (string, error) {
 	
 	tokens := strings.Fields(input)
 
 	if len(tokens) == 0 {
-		return nil, errors.New("no se proporcionó ningún comando")
+		return "", errors.New("no se proporcionó ningún comando")
 	}
 
 	switch tokens[0] {
@@ -37,6 +37,6 @@ func Analyzer(input string) (interface{}, error) {
 	case "cat":
 		return commands.ParseCat(tokens[1:])
 	default:
-		return nil, fmt.Errorf("comando desconocido: %s", tokens[0])
+		return "", fmt.Errorf("comando desconocido: %s", tokens[0])
 	}
 }

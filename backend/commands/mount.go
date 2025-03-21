@@ -15,7 +15,7 @@ type MOUNT struct {
 	name string
 }
 
-func ParseMount(tokens []string) (*MOUNT, error) {
+func ParseMount(tokens []string) (string, error) {
 	cmd := &MOUNT{} // create the mkdisk command
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
@@ -27,7 +27,7 @@ func ParseMount(tokens []string) (*MOUNT, error) {
 	for _, match := range matches {
 		kv := strings.SplitN(match, "=", 2) // split the match in key and value
 		if len(kv) != 2 {
-			return nil, fmt.Errorf("invalid argument: %s", match)
+			return "", fmt.Errorf("invalid argument: %s", match)
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -38,25 +38,25 @@ func ParseMount(tokens []string) (*MOUNT, error) {
 		switch key {
 			case "-path":
 				if value == "" {
-					return nil, errors.New("invalid path")
+					return "", errors.New("invalid path")
 				}
 				cmd.path = value
 			case "-name":
 				if value == "" {
-					return nil, errors.New("invalid name")
+					return "", errors.New("invalid name")
 				}
 				cmd.name = value
 			default:
-				return nil, fmt.Errorf("invalid argument: %s", key)
+				return "", fmt.Errorf("invalid argument: %s", key)
 		}
 	}
 
 	if cmd.path == "" {
-		return nil, errors.New("missing path")
+		return "", errors.New("missing path")
 	}
 
 	if cmd.name == "" {
-		return nil, errors.New("missing name")
+		return "", errors.New("missing name")
 	}
 
 	err := commandMount(cmd)
@@ -64,7 +64,7 @@ func ParseMount(tokens []string) (*MOUNT, error) {
 		fmt.Println("error: ", err)
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("mounting partition %s in %s", cmd.name, cmd.path), nil
 }
 
 func commandMount(mount *MOUNT) error {

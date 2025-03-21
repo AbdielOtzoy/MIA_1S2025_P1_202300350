@@ -6,13 +6,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"fmt"
 )
 
 type RMDISK struct {
 	Path string
 }
 
-func ParseRmdisk(tokens []string) (*RMDISK, error) {
+func ParseRmdisk(tokens []string) (string, error) {
 	cmd := &RMDISK{} // create the rmdisk command
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
@@ -26,7 +27,7 @@ func ParseRmdisk(tokens []string) (*RMDISK, error) {
 		// dibide the argument in the key and value
 		kv := strings.SplitN(match, "=", 3)
 		if len(kv) != 2 {
-			return nil, errors.New("invalid argument")
+			return "", errors.New("invalid argument")
 		}
 		key, value := strings.ToLower(kv[0]), kv[1]
 
@@ -38,20 +39,20 @@ func ParseRmdisk(tokens []string) (*RMDISK, error) {
 			case "-path":
 				cmd.Path = value
 			default:
-				return nil, errors.New("invalid argument")
+				return "", errors.New("invalid argument")
 		}
 	}
 
 	if cmd.Path == "" {
-		return nil, errors.New("missing path")
+		return "", errors.New("missing path")
 	}
 
 	err := commandRmdisk(cmd)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return cmd, nil
+	return fmt.Sprintf("Disk %s removed successfully", cmd.Path), nil
 }
 
 func commandRmdisk(cmd *RMDISK) error {
