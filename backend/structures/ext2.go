@@ -68,7 +68,7 @@ func (sb *SuperBlock) CreateUsersFile(path string) error {
 	sb.S_first_blo += sb.S_block_size
 
 	// ----------- Creamos /users.txt -----------
-	usersText := "1,G,root\n1,U,root,123\n"
+	usersText := "1,G,root\n1,U,root,root,123\n"
 
 	// Deserializar el inodo raíz
 	err = rootInode.Deserialize(path, int64(sb.S_inode_start+0)) // 0 porque es el inodo raíz
@@ -653,3 +653,66 @@ func (sb *SuperBlock) readFileInInode(path string, inodeIndex int32, parentsDir 
 	}
 	return "", fmt.Errorf("no se encontró el archivo")
 }   
+
+func (sb *SuperBlock) loginUserInInode(user string, password string, path string) error {
+	// para iniciar sesión se debe leer el archivo users.txt
+	// y verificar si el usuario y la contraseña son correctos
+
+	// el users.txt siempre esta en el bloque 1
+	useBlock := &FileBlock{}
+
+	// deserializar el bloque
+	err := useBlock.Deserialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+	if err != nil {
+		return err
+	}
+
+	// obtener el contenido del bloque
+	content := string(useBlock.B_content[:])
+	fmt.Println("Contenido del bloque: ", content)
+
+	// separar el contenido por lineas
+	lines := strings.Split(content, "\n")
+
+	// iterar sobre cada linea
+	for _, line := range lines {
+		fmt.Println("Linea: ", line)
+		// separar la linea por comas
+		parts := strings.Split(line, ",")
+
+		/*
+			formato del archivo:
+			GID, Tipo, Grupo \n
+			UID, Tipo, Grupo, Usuario, Contraseña \n
+		*/
+
+		fmt.Println("Partes: ", parts)
+		
+
+		// verificar si es un grupo
+		if parts[1] == "G" {
+			fmt.Println("Grupo: ", parts[2])
+		}
+		// verificar si es un usuario
+		if parts[1] == "U" {
+			fmt.Println("Usuario: ", parts[3])
+			fmt.Println("Contraseña: ", parts[4])
+			if parts[3] == user && parts[4] == password {
+				fmt.Println("Usuario: ", parts[3])
+				fmt.Println("Contraseña: ", parts[4])
+				return nil
+			} else if parts[3] == user && parts[4] != password {
+				fmt.Println("Contraseña incorrecta")
+				return fmt.Errorf("contraseña incorrecta")
+			} else {
+				fmt.Println("Usuario o contraseña incorrectos")
+			}
+		}
+
+
+
+	}
+
+	return fmt.Errorf("no se encontró el usuario")
+
+}

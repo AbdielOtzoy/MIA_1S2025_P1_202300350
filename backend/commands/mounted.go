@@ -4,6 +4,7 @@ import (
 	"errors"
 	"backend/stores"
 	"fmt"
+	"strings"
 )
 
 // no fields are needed for this command
@@ -16,9 +17,12 @@ func ParseMounted(tokens []string) (string, error) {
 		return "", errors.New("no se esperaban argumentos")
 	}
 
-	stores.PrintMountedPartitions()
+	mountedPartitions := stores.GetMountedPartitions()
 
-	return fmt.Sprintf("Se han mostrado las particiones montadas"), nil
-	
+	if len(mountedPartitions) == 0 {
+		return "No hay particiones montadas", nil
+	}
+
+	return "Particiones montadas:\n" + strings.Join(mountedPartitions, "\n"), nil
 }
 

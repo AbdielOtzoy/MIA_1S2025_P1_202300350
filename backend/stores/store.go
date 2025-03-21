@@ -9,7 +9,20 @@ const Carnet string = "50" // 202300350
 
 var (
 	MountedPartitions map[string]string = make(map[string]string)
+	userNameLogged string = ""
+	idMountedPartition string = ""
+
 )
+
+func SetSession(user string, idPartition string) {
+	userNameLogged = user
+	idMountedPartition = idPartition
+}
+
+func GetSession() (string, string) {	
+	return userNameLogged, idMountedPartition
+}
+
 
 func GetMountedPartition(id string) (*structures.Partition, string, error) {
 	path := MountedPartitions[id]
@@ -65,6 +78,15 @@ func PrintMountedPartitions() {
 	for id, path := range MountedPartitions {
 		println("id:", id, "path:", path)
 	}
+}
+
+// return string[] with the mounted partitions
+func GetMountedPartitions() []string {
+	var mountedPartitions []string
+	for id := range MountedPartitions {
+		mountedPartitions = append(mountedPartitions, id)
+	}
+	return mountedPartitions
 }
 
 // GetMountedPartitionSuperblock obtiene el SuperBlock de la partición montada con el id especificado

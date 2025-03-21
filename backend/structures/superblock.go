@@ -244,3 +244,12 @@ func (sb *SuperBlock) ReadFile(path string, parentsDir []string, destDir string)
 	fmt.Println("Contenido del archivo:", content)
 	return content, nil
 }
+
+func (sb *SuperBlock) LoginUser(user string, password string, path string) error {
+	err := sb.loginUserInInode(user, password, path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
