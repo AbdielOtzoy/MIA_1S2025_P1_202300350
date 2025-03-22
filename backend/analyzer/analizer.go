@@ -38,6 +38,12 @@ func Analyzer(input string) (string, error) {
 		return commands.ParseCat(tokens[1:])
 	case "login":
 		return commands.ParseLogin(tokens[1:])
+	case "logout":
+		return commands.ParseLogout(tokens[1:])
+	case "mkgrp":
+		return commands.ParseMkgroup(tokens[1:])
+	case "rmgrp":
+		return commands.ParseRmgroup(tokens[1:])
 	default:
 		return "", fmt.Errorf("comando desconocido: %s", tokens[0])
 	}

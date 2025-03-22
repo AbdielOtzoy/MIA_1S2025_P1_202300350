@@ -7,47 +7,14 @@ digraph G {
 <tr><td>1: .</td></tr>
 <tr><td>2: ..</td></tr>
 <tr><td>3: users.txt</td></tr>
-<tr><td>4: home</td></tr>
+<tr><td>4: -</td></tr>
 </table>>];
 block1 [label=<
 <table border='0' cellborder='1' cellspacing='0'>
 <tr><td bgcolor='lightblue'><b>Block 1</b></td></tr>
 <tr><td>1,G,root
-1,U,root,123
+1,U,root,root,123
 </td></tr>
 </table>>];
-block2 [label=<
-<table border='0' cellborder='1' cellspacing='0'>
-<tr><td bgcolor='lightblue'><b>Block 2</b></td></tr>
-<tr><td>1: .</td></tr>
-<tr><td>2: ..</td></tr>
-<tr><td>3: usac</td></tr>
-<tr><td>4: mia</td></tr>
-</table>>];
-block3 [label=<
-<table border='0' cellborder='1' cellspacing='0'>
-<tr><td bgcolor='lightblue'><b>Block 3</b></td></tr>
-<tr><td>1: .</td></tr>
-<tr><td>2: ..</td></tr>
-<tr><td>3: -</td></tr>
-<tr><td>4: -</td></tr>
-</table>>];
-block4 [label=<
-<table border='0' cellborder='1' cellspacing='0'>
-<tr><td bgcolor='lightblue'><b>Block 4</b></td></tr>
-<tr><td>1: .</td></tr>
-<tr><td>2: ..</td></tr>
-<tr><td>3: mia.txt</td></tr>
-<tr><td>4: -</td></tr>
-</table>>];
-block5 [label=<
-<table border='0' cellborder='1' cellspacing='0'>
-<tr><td bgcolor='lightblue'><b>Block 5</b></td></tr>
-<tr><td>informacion</td></tr>
-</table>>];
 block0 -> block1;
-block1 -> block2;
-block2 -> block3;
-block3 -> block4;
-block4 -> block5;
 }

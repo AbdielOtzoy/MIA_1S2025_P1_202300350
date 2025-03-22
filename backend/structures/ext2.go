@@ -669,14 +669,24 @@ func (sb *SuperBlock) loginUserInInode(user string, password string, path string
 
 	// obtener el contenido del bloque
 	content := string(useBlock.B_content[:])
-	fmt.Println("Contenido del bloque: ", content)
+
+	// serializar el bloque
+	err = useBlock.Serialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+	if err != nil {
+		return err
+	}
 
 	// separar el contenido por lineas
 	lines := strings.Split(content, "\n")
+	// eliminar la ultima linea si es vacia
+	if lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+
+	fmt.Println("Contenido login: ", content)
 
 	// iterar sobre cada linea
 	for _, line := range lines {
-		fmt.Println("Linea: ", line)
 		// separar la linea por comas
 		parts := strings.Split(line, ",")
 
@@ -715,4 +725,208 @@ func (sb *SuperBlock) loginUserInInode(user string, password string, path string
 
 	return fmt.Errorf("no se encontró el usuario")
 
+}
+
+func (sb *SuperBlock) createGroupInInode(name string, path string) error {
+    useBlock := &FileBlock{}
+
+    // Deserializar el bloque
+    err := useBlock.Deserialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+    if err != nil {
+        return err
+    }
+
+    fmt.Println("Tamaño del bloque: ", len(useBlock.B_content))
+
+    // Encontrar dónde termina realmente el contenido (primer byte nulo o fin del array)
+    var contentEndPos int
+    for i, b := range useBlock.B_content {
+        if b == 0 {
+            contentEndPos = i
+            break
+        }
+    }
+    // Si no hay bytes nulos, usar todo el array
+    if contentEndPos == 0 {
+        contentEndPos = len(useBlock.B_content)
+    }
+
+    // Obtener solo el contenido real (sin bytes nulos)
+    content := string(useBlock.B_content[:contentEndPos])
+    
+    fmt.Println("Tamaño del contenido real: ", len(content))
+    fmt.Println("Contenido Grup: ", content)
+
+    // Separar el contenido por líneas
+    lines := strings.Split(content, "\n")
+
+    // Eliminar el último elemento si está vacío
+    if len(lines) > 0 && lines[len(lines)-1] == "" {
+        lines = lines[:len(lines)-1]
+    }
+
+    // Resto del código para verificar si el grupo existe...
+    for _, line := range lines {
+        parts := strings.Split(line, ",")
+        
+        fmt.Println("Partes: ", parts)
+        
+        if len(parts) > 1 && parts[1] == "G" {
+            fmt.Println("Grupo: ", parts[2])
+            if parts[2] == name {
+                fmt.Println("Grupo ya existe")
+                return fmt.Errorf("grupo ya existe")
+            }
+        }
+    }
+
+    // Si el grupo no existe, agregarlo
+    newGrupo := fmt.Sprintf("%d,G,%s\n", sb.S_inodes_count, name)
+    newContent := content + newGrupo
+    fmt.Println("Nuevo grupo: ", newGrupo)
+    fmt.Println("Contenido nuevo: ", newContent)
+    fmt.Println("Tamaño del nuevo contenido: ", len(newContent))
+
+    // Verificar si el nuevo contenido cabe en el bloque
+    contentBytes := []byte(newContent)
+    if len(contentBytes) > len(useBlock.B_content) {
+        fmt.Printf("Excede por: %d bytes\n", len(contentBytes) - len(useBlock.B_content))
+        return fmt.Errorf("contenido excede el tamaño del bloque")
+    }
+
+    // Limpiar el array primero
+    for i := range useBlock.B_content {
+        useBlock.B_content[i] = 0
+    }
+    
+    // Copiar byte por byte el nuevo contenido
+    for i := 0; i < len(contentBytes); i++ {
+        useBlock.B_content[i] = contentBytes[i]
+    }
+    
+    fmt.Println("Bloque después de actualizar: ", string(useBlock.B_content[:]))
+    
+    // Serializar el bloque
+    err = useBlock.Serialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+func (sb *SuperBlock) removeGroupInInode(name string, path string) error {
+	userBlock := &FileBlock{}
+
+	// Deserializar el bloque
+	err := userBlock.Deserialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Tamaño del bloque: ", len(userBlock.B_content))
+
+	// Encontrar dónde termina realmente el contenido (primer byte nulo o fin del array)
+	var contentEndPos int
+	for i, b := range userBlock.B_content {
+		if b == 0 {
+			contentEndPos = i
+			break
+		}
+	}
+	// Si no hay bytes nulos, usar todo el array
+	if contentEndPos == 0 {
+		contentEndPos = len(userBlock.B_content)
+	}
+
+	// Obtener solo el contenido real (sin bytes nulos)
+	content := string(userBlock.B_content[:contentEndPos])
+	
+	fmt.Println("Tamaño del contenido real: ", len(content))
+	fmt.Println("Contenido Grup: ", content)
+
+	// Separar el contenido por líneas
+	lines := strings.Split(content, "\n")
+
+	// Eliminar el último elemento si está vacío
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+
+	// Variable para indicar si se encontró y modificó el grupo
+	grupoEncontrado := false
+	// Variable para almacenar el nuevo contenido
+	var newContent strings.Builder
+
+	for i, line := range lines {
+		parts := strings.Split(line, ",")
+		
+		fmt.Println("Partes: ", parts)
+		
+		if len(parts) > 2 && parts[1] == "G" && parts[2] == name {
+			fmt.Println("Grupo encontrado: ", parts[2])
+			
+			if parts[0] == "0" {
+				return fmt.Errorf("El grupo ya no existe porque ya fue eliminado")
+			}
+			
+			// Modificar el GID a 0 para marcar como eliminado
+			parts[0] = "0"
+			grupoEncontrado = true
+			
+			// Reconstruir la línea con el GID modificado
+			modifiedLine := strings.Join(parts, ",")
+			
+			// Añadir la línea modificada
+			newContent.WriteString(modifiedLine)
+		} else {
+			// Añadir la línea sin modificar
+			newContent.WriteString(line)
+		}
+		
+		// Añadir salto de línea si no es la última línea
+		if i < len(lines)-1 {
+			newContent.WriteString("\n")
+		} else {
+			// Añadir salto de línea al final
+			newContent.WriteString("\n")
+		}
+	}
+
+	if !grupoEncontrado {
+		fmt.Println("Grupo no encontrado")
+		return fmt.Errorf("grupo no encontrado")
+	}
+
+	// Obtener el contenido modificado
+	finalContent := newContent.String()
+	fmt.Println("Contenido modificado: ", finalContent)
+	fmt.Println("Tamaño del contenido modificado: ", len(finalContent))
+
+	// Verificar si el nuevo contenido cabe en el bloque
+	contentBytes := []byte(finalContent)
+	if len(contentBytes) > len(userBlock.B_content) {
+		fmt.Printf("Excede por: %d bytes\n", len(contentBytes) - len(userBlock.B_content))
+		return fmt.Errorf("contenido excede el tamaño del bloque")
+	}
+
+	// Limpiar el array primero
+	for i := range userBlock.B_content {
+		userBlock.B_content[i] = 0
+	}
+	
+	// Copiar byte por byte el nuevo contenido
+	for i := 0; i < len(contentBytes); i++ {
+		userBlock.B_content[i] = contentBytes[i]
+	}
+	
+	fmt.Println("Bloque después de actualizar: ", string(userBlock.B_content[:len(contentBytes)]))
+	
+	// Serializar el bloque
+	err = userBlock.Serialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Grupo eliminado exitosamente (GID cambiado a 0)")
+	return nil
 }
