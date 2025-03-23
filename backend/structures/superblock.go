@@ -271,3 +271,30 @@ func (sb *SuperBlock) RemoveGroup(name string, path string) error {
 
 	return nil
 }
+
+func (sb *SuperBlock) CreateUser(user string, password string, group string, path string) error {
+	err := sb.createUserInInode(user, password, group, path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (sb *SuperBlock) RemoveUser(user string, path string) error {
+	err := sb.removeUserInInode(user, path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (sb *SuperBlock) ChangeGroup(user string, group string, path string) error {
+	err := sb.changeGroupInInode(user, group, path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

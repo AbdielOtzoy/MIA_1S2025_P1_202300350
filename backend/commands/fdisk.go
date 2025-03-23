@@ -295,32 +295,23 @@ func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
 	fmt.Println("New EBR")
 	newEbr.PrintEBR()
 
-	// Serialize the new EBR
-	err = newEbr.SerializeEBR(fdisk.path, int64(lastEBR.Ebr_part_start))
-	if err != nil {
-		fmt.Println("error serializing EBR:", err)
-		return err
-	}
-
 	// Update the last EBR
 	lastEBR.Ebr_part_next = newEbr.Ebr_part_start
-	fmt.Println("Last EBR")
+	lastEBR.Ebr_part_size = int32(logicalSize)
+	fmt.Println("Last EBR after update")
 	lastEBR.PrintEBR()
+
 	err = lastEBR.SerializeEBR(fdisk.path, int64(lastEBR.Ebr_part_start))
 	if err != nil {
 		fmt.Println("error serializing last EBR:", err)
 		return err
 	}
 
-	// Print the partitions
-	fmt.Println("\nParticiones del MBR:")
-
-	mbr.PrintPartitions()
-
-	// Serialize the MBR
-	err = mbr.SerializeMBR(fdisk.path)
+	// Serialize the new EBR
+	err = newEbr.SerializeEBR(fdisk.path, int64(newEbr.Ebr_part_start))
 	if err != nil {
-		fmt.Println("error serializing MBR:", err)
+		fmt.Println("error serializing EBR:", err)
+		return err
 	}
 
 	return nil

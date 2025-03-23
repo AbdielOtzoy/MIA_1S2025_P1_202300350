@@ -44,6 +44,12 @@ func Analyzer(input string) (string, error) {
 		return commands.ParseMkgroup(tokens[1:])
 	case "rmgrp":
 		return commands.ParseRmgroup(tokens[1:])
+	case "chgrp":
+		return commands.ParseChgrp(tokens[1:])
+	case "mkusr":
+		return commands.ParseMkuser(tokens[1:])
+	case "rmusr":
+		return commands.ParseRmuser(tokens[1:])
 	default:
 		return "", fmt.Errorf("comando desconocido: %s", tokens[0])
 	}

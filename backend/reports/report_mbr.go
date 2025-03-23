@@ -45,7 +45,7 @@ func ReportMBR(mbr *structures.MBR, diskPath string, path string) error {
 				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>%s</td></tr>
 			`, i+1, partStatus, partType, partFit, part.Part_start, part.Part_size, partName)
 
-		if partType== 'e' {
+		if partType== 'E' {
 			ebr := structures.EBR{}
 			err := ebr.DeserializeEBR(diskPath, int64(part.Part_start))
 			if err != nil {
@@ -53,14 +53,23 @@ func ReportMBR(mbr *structures.MBR, diskPath string, path string) error {
 			}
 
 			ebr.PrintEBR()
+
+			nextEBR := ebr.Ebr_part_next
+			for nextEBR != -1 {
+				err := ebr.DeserializeEBR(diskPath, int64(nextEBR))
+				if err != nil {
+					return fmt.Errorf("error al deserializar el EBR: %v", err)
+				}
+
+				ebr.PrintEBR()
+				nextEBR = ebr.Ebr_part_next
+			}
 			
-			// path: "/home/abdielo/dev/archivos/proyecto1/backend/output/report_mbr.png"
-			// ebrPath := "/home/abdielo/dev/archivos/proyecto1/backend/output/ebr_index.png"
-			ebrPath := fmt.Sprintf("%s/ebr_%d.png", path, i+1)
-			fmt.Println("EBR Path:", ebrPath)
-			ebrDotFileName, _ := utils.GetFileNames(ebrPath)
-			fmt.Println("EBR Dot File Name:", ebrDotFileName)
-			ReportEBR(&ebr, ebrDotFileName)
+			ebrPath := utils.ReplacePath(path, "report_ebr.png")
+			fmt.Println("EBR Path: ", ebrPath)
+
+			ReportEBR(&ebr, ebrPath)
+			
 		}
 	}
 

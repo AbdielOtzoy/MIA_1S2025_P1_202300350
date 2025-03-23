@@ -155,3 +155,13 @@ func SplitPath(path string) []string {
 	// retornar pero sin el ultimo elemento ya que solo se verifica que existan las carpetas padre
 	return result[:len(result)-1]
 }
+ // Función que recibe la ruta original y el newPath, y devuelve la nueva ruta
+func ReplacePath(originalPath, newPath string) string {
+	// Obtener el directorio de la ruta original
+	dir := filepath.Dir(originalPath)
+	
+	// Combinar el directorio con el newPath
+	newFullPath := filepath.Join(dir, newPath)
+	
+	return newFullPath
+}

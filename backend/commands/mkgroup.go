@@ -65,7 +65,7 @@ func createGroup(name string) string {
 		return "No tiene permisos para crear grupos"
 	}
 
-	partitionSuperblock, _, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
+	partitionSuperblock, mountedPartition, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
 	if err != nil {
 		return "Error al obtener el superbloque de la partición: %w"
 	}
@@ -74,6 +74,12 @@ func createGroup(name string) string {
 
 	if err != nil {
 		return fmt.Sprintf("Error al crear el grupo: %s", err)
+	}
+
+	// serializar el superbloque
+	err = partitionSuperblock.Serialize(partitionPath, int64(mountedPartition.Part_start))
+	if err != nil {
+		return fmt.Sprintf("Error al serializar el superbloque: %s", err)
 	}
 
 	return fmt.Sprintf("Grupo %s creado correctamente", name)
