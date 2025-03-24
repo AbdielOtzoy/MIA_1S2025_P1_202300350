@@ -196,6 +196,21 @@ func createExtendedPartition(fdisk *FDISK, sizeBytes int) error {
 		fmt.Println("error reading MBR:", err)
 	}
 
+	// Check if there is an extended partition
+	extendedPartition, _ := mbr.GetExtendedPartition()
+	if extendedPartition != nil {
+		fmt.Println("extended partition already exists")
+		return errors.New("extended partition already exists")
+	}
+	// Check if there is space for the extended partition
+	availablePartition, _, _ := mbr.GetFreePartition()
+	if availablePartition == nil {
+		fmt.Println("no available partition")
+		return errors.New("no available partition")
+	}
+
+
+
 	fmt.Println("MBR before creating extended partition")
 	mbr.PrintMBR()
 
@@ -257,6 +272,7 @@ func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
 	err := mbr.DeserializeMBR(fdisk.path)
 	if err != nil {
 		fmt.Println("error reading MBR:", err)
+		return err
 	}
 
 	fmt.Println("MBR before creating logical partition")
@@ -273,19 +289,36 @@ func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
 	fmt.Println("Extended partition")
 	extendedPartition.PrintPartition()
 
-	// Get the last EBR
-	lastEBR, err := extendedPartition.GetLastEBR(fdisk.path)
+	// Get the first ebr in the extendened partition, the first ebr is in the extendedPartition.Part_start + 32
+	ebr := &structures.EBR{}
+	err = ebr.DeserializeEBR(fdisk.path, int64(extendedPartition.Part_start+32))
 	if err != nil {
-		fmt.Println("error getting last EBR:", err)
-		return err
+		fmt.Println("error reading EBR:", err)
 	}
 
-	// create the new EBR
+	fmt.Println("First EBR")
+	ebr.PrintEBR()
+
+	lastEBR, _, err := extendedPartition.GetLastEBR(ebr, fdisk.path)
+	fmt.Println("Last EBR")
+	lastEBR.PrintEBR()
+
+	// Calculate the start of the new EBR
+	newEbrStart := lastEBR.Ebr_part_start + structures.EBRSize + int32(logicalSize)
+	fmt.Println("New EBR start:", newEbrStart)
+
+	// Ensure that the new EBR does not overlap with other partitions or EBRs
+	if newEbrStart > extendedPartition.Part_start+extendedPartition.Part_size {
+		fmt.Println("not enough space in the extended partition")
+		return errors.New("not enough space in the extended partition")
+	}
+
+	// Create the new EBR
 	newEbr := &structures.EBR{
 		Ebr_part_mount: [1]byte{'N'},
 		Ebr_part_fit:   [1]byte{fdisk.fit[0]},
-		Ebr_part_start: int32(lastEBR.Ebr_part_start + structures.EBRSize + int32(logicalSize)),
-		Ebr_part_size:  -1,
+		Ebr_part_start: newEbrStart,
+		Ebr_part_size:  int32(logicalSize),
 		Ebr_part_next:  -1,
 		Ebr_part_name:  [16]byte{},
 	}
@@ -301,19 +334,29 @@ func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
 	fmt.Println("Last EBR after update")
 	lastEBR.PrintEBR()
 
+	// Serialize the new EBR
+	err = newEbr.SerializeEBR(fdisk.path, int64(newEbr.Ebr_part_start))
+	if err != nil {
+		fmt.Println("error serializing new EBR:", err)
+		return err
+	}
+
+	// Serialize the last EBR
 	err = lastEBR.SerializeEBR(fdisk.path, int64(lastEBR.Ebr_part_start))
 	if err != nil {
 		fmt.Println("error serializing last EBR:", err)
 		return err
 	}
 
-	// Serialize the new EBR
-	err = newEbr.SerializeEBR(fdisk.path, int64(newEbr.Ebr_part_start))
+	
+
+	// Serialize the MBR
+	err = mbr.SerializeMBR(fdisk.path)
 	if err != nil {
-		fmt.Println("error serializing EBR:", err)
+		fmt.Println("error serializing MBR", err)
 		return err
 	}
 
+	fmt.Println("Logical partition created successfully")
 	return nil
-
 }

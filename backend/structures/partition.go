@@ -13,6 +13,7 @@ type Partition struct {
 	Part_id 		   	[4]byte
 }
 
+
 func (p *Partition) CreatePartition(partStart, partSize int, partType, partFit, partName string) {
 
 	p.Part_status[0] = '0' // 0 = Created, -1 = No created
@@ -40,29 +41,30 @@ func (p *Partition) MountPartition(correlative int, id string) error {
 }
 
 // GetLastEBR returns the last EBR in the linked list
-func (p *Partition) GetLastEBR(path string) (*EBR, error) {
-	var ebr EBR
-	// get the first EBR, which is the start of the linked list
-	err := ebr.DeserializeEBR(path, int64(p.Part_start))
-	if err != nil {
-		return nil, err
+func (p *Partition) GetLastEBR(ebr *EBR, path string) (*EBR, int32, error) {
+	// get the last EBR in the linked list
+	// if the partition is not extended, return nil
+	if p.Part_type[0] != 'E' {
+		return nil, -1, fmt.Errorf("partition is not extended")
 	}
-	fmt.Println("First EBR")
+	// recorrer el EBR hasta encontrar el ultimo
+
+	next := ebr.Ebr_part_next
+	for next != -1 {
+		// deserialize the EBR
+		err := ebr.DeserializeEBR(path, int64(next))
+		if err != nil {
+			return nil, -1, err
+		}
+		next = ebr.Ebr_part_next
+	}
+
+	fmt.Println("Last EBR")
 	ebr.PrintEBR()
 
-	// iterate over the linked list to get the last EBR
-	for ebr.Ebr_part_next != -1 {
-		err = ebr.DeserializeEBR(path, int64(ebr.Ebr_part_next))
-		if err != nil {
-			return nil, err
-		}
-		fmt.Println("Next EBR")
-		ebr.PrintEBR()
-	}
+	return ebr, next, nil
 
-	return &ebr, nil
 }
-
 func (p *Partition) PrintPartition() {
 	partStatus := rune(p.Part_status[0])
 	partType := rune(p.Part_type[0])

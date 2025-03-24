@@ -111,12 +111,11 @@ func (mbr *MBR) GetPartitionByID(id string) (*Partition, error) {
 
 // GetExtendedPartition
 func (mbr *MBR) GetExtendedPartition() (*Partition, int) {
-	for i, partition := range mbr.Mbr_partitions {
-		if partition.Part_type[0] == 'E' {
-			return &partition, i
+	for i := range mbr.Mbr_partitions {
+		if mbr.Mbr_partitions[i].Part_type[0] == 'E' {
+			return &mbr.Mbr_partitions[i], i
 		}
 	}
-
 	return nil, -1
 }
 

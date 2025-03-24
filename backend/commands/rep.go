@@ -129,6 +129,13 @@ func commandRep(rep *REP) (string, error) {
 			fmt.Printf("Error: %v\n", err)
 		}
 		return fmt.Sprintf("Superblock report generated at %s", rep.path), nil
+	case "disk":
+		err = reports.ReportDisk(mountedMbr, mountedDiskPath, rep.path)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+
+		return fmt.Sprintf("Disk report generated at %s", rep.path), nil
 
 	}
 

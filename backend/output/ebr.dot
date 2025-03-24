@@ -1,0 +1,32 @@
+digraph G {
+				node [shape=plaintext]
+				tabla [label=<
+					<table border="0" cellborder="1" cellspacing="0">
+						<tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE EBR</b></font></td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_mount</b></td><td>N</td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_fit</b></td><td>B</td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_start</b></td><td>255</td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_size</b></td><td>1024</td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_next</b></td><td>1311</td></tr>
+						<tr><td bgcolor="lightgray"><b>ebr_part_name</b></td><td>Particion3e</td></tr>
+					</table>>] 
+					tabla_1311 [label=<
+						<table border="0" cellborder="1" cellspacing="0">
+							<tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE EBR</b></font></td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_mount</b></td><td>N</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_fit</b></td><td>B</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_start</b></td><td>1311</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_size</b></td><td>1024</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_next</b></td><td>2367</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_name</b></td><td>Particion5L</td></tr>
+						</table>>] 
+					tabla_2367 [label=<
+						<table border="0" cellborder="1" cellspacing="0">
+							<tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE EBR</b></font></td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_mount</b></td><td>N</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_fit</b></td><td>B</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_start</b></td><td>2367</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_size</b></td><td>1024</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_next</b></td><td>-1</td></tr>
+							<tr><td bgcolor="lightgray"><b>ebr_part_name</b></td><td>Particion4L</td></tr>
+						</table>>] }

@@ -6,7 +6,7 @@ digraph G {
 				<tr><td bgcolor="lightgray"><b>ebr_part_mount</b></td><td>N</td></tr>
 				<tr><td bgcolor="lightgray"><b>ebr_part_fit</b></td><td>B</td></tr>
 				<tr><td bgcolor="lightgray"><b>ebr_part_start</b></td><td>255</td></tr>
-				<tr><td bgcolor="lightgray"><b>ebr_part_size</b></td><td>-1</td></tr>
-				<tr><td bgcolor="lightgray"><b>ebr_part_next</b></td><td>-1</td></tr>
+				<tr><td bgcolor="lightgray"><b>ebr_part_size</b></td><td>1024</td></tr>
+				<tr><td bgcolor="lightgray"><b>ebr_part_next</b></td><td>1311</td></tr>
 				<tr><td bgcolor="lightgray"><b>ebr_part_name</b></td><td>Particion3e</td></tr>
 			</table>>] }

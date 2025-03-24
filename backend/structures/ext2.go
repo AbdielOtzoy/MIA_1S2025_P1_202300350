@@ -661,26 +661,29 @@ func (sb *SuperBlock) readFileInInode(path string, inodeIndex int32, parentsDir 
 }   
 
 func (sb *SuperBlock) loginUserInInode(user string, password string, path string) error {
-	// para iniciar sesión se debe leer el archivo users.txt
-	// y verificar si el usuario y la contraseña son correctos
-
-	// el users.txt siempre esta en el bloque 1
-	useBlock := &FileBlock{}
-
-	// deserializar el bloque
-	err := useBlock.Deserialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
-	if err != nil {
-		return err
-	}
-
 	// obtener el contenido del bloque
-	content := string(useBlock.B_content[:])
+	content := sb.getUsersContent(path)
 
-	// serializar el bloque
-	err = useBlock.Serialize(path, int64(sb.S_block_start+(1*sb.S_block_size)))
-	if err != nil {
-		return err
+	fmt.Println("Tamaño del bloque: ", len(content))
+
+	var contentEndPos int
+	// encontrar donde termina realmente el contenido (primer byte nulo o fin del array)
+	for i, b := range content {
+		if b == 0 {
+			contentEndPos = i
+			break
+		}
 	}
+
+	// si no hay bytes nulos, usar todo el array
+	if contentEndPos == 0 {
+		contentEndPos = len(content)
+	}
+
+	// obtener solo el contenido real (sin bytes nulos)
+	content = string(content[:contentEndPos])
+	fmt.Println("Tamaño del contenido real: ", len(content))
+	// eliminar los caracteres nulos
 
 	// separar el contenido por lineas
 	lines := strings.Split(content, "\n")
