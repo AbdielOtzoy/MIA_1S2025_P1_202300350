@@ -195,34 +195,13 @@ func (sb *SuperBlock) PrintBlocks(path string) error {
 
 // CreateFolder crea una carpeta en el sistema de archivos
 func (sb *SuperBlock) CreateFolder(path string, parentsDir []string, destDir string) error {
-	if len(parentsDir) == 0 {
-		return sb.createFolderInInode(path, 0, parentsDir, destDir)
-	}
+	return sb.createFolderInInode(path, 0, parentsDir, destDir)
 
-	for i := int32(0); i < sb.S_inodes_count; i++ {
-		err := sb.createFolderInInode(path, i, parentsDir, destDir)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // CreateFile crea un archivo en el sistema de archivos
 func (sb *SuperBlock) CreateFile(path string, parentsDir []string, destDir string, r bool, size int, content string) error {
-	if len(parentsDir) == 0 {
-		return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content)
-	}
-
-	for i := int32(0); i < sb.S_inodes_count; i++ {
-		err := sb.createFileInode(path, i, parentsDir, destDir, r, size, content)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content)
 }
 
 func (sb *SuperBlock) ExistsFolcer(path string, parentsDir []string, destDir string) (bool, error) {

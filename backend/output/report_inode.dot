@@ -7,9 +7,9 @@ digraph G {
                 <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>777</td></tr>
                 <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
@@ -26,13 +26,89 @@ inode1 [label=<
                 <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_size</b></td><td>27</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
-                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-22T18:44:48-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:51:12-06:00</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_type</b></td><td>1</td></tr>
                 <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>777</td></tr>
                 <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
-            <tr><td bgcolor='lightgreen'>1</td><td>1</td></tr><tr><td bgcolor='lightgreen'>2</td><td>2</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
+            <tr><td bgcolor='lightgreen'>1</td><td>1</td></tr><tr><td bgcolor='lightgreen'>2</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
+                <tr><td colspan="2" bgcolor="yellow"><b>BLOQUES INDIRECTOS</b></td></tr>
+                <tr><td>Simple</td><td>-1</td></tr>
+                <tr><td>Doble</td><td>-1</td></tr>
+                <tr><td>Triple</td><td>-1</td></tr>
+            </table>>];
+        inode1 -> inode2 [color=red, penwidth=2];
+inode2 [label=<
+            <table border="0" cellborder="1" cellspacing="0">
+                <tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 2</b></font></td></tr>
+                <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+                <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
+            <tr><td bgcolor='lightgreen'>1</td><td>2</td></tr><tr><td bgcolor='lightgreen'>2</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
+                <tr><td colspan="2" bgcolor="yellow"><b>BLOQUES INDIRECTOS</b></td></tr>
+                <tr><td>Simple</td><td>-1</td></tr>
+                <tr><td>Doble</td><td>-1</td></tr>
+                <tr><td>Triple</td><td>-1</td></tr>
+            </table>>];
+        inode2 -> inode3 [color=red, penwidth=2];
+inode3 [label=<
+            <table border="0" cellborder="1" cellspacing="0">
+                <tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 3</b></font></td></tr>
+                <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+                <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
+            <tr><td bgcolor='lightgreen'>1</td><td>3</td></tr><tr><td bgcolor='lightgreen'>2</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
+                <tr><td colspan="2" bgcolor="yellow"><b>BLOQUES INDIRECTOS</b></td></tr>
+                <tr><td>Simple</td><td>-1</td></tr>
+                <tr><td>Doble</td><td>-1</td></tr>
+                <tr><td>Triple</td><td>-1</td></tr>
+            </table>>];
+        inode3 -> inode4 [color=red, penwidth=2];
+inode4 [label=<
+            <table border="0" cellborder="1" cellspacing="0">
+                <tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 4</b></font></td></tr>
+                <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:53:20-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_type</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+                <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
+            <tr><td bgcolor='lightgreen'>1</td><td>4</td></tr><tr><td bgcolor='lightgreen'>2</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
+                <tr><td colspan="2" bgcolor="yellow"><b>BLOQUES INDIRECTOS</b></td></tr>
+                <tr><td>Simple</td><td>-1</td></tr>
+                <tr><td>Doble</td><td>-1</td></tr>
+                <tr><td>Triple</td><td>-1</td></tr>
+            </table>>];
+        inode4 -> inode5 [color=red, penwidth=2];
+inode5 [label=<
+            <table border="0" cellborder="1" cellspacing="0">
+                <tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 5</b></font></td></tr>
+                <tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-24T18:55:28-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-24T18:55:28-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-24T18:55:28-06:00</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
+                <tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+                <tr><td colspan="2" bgcolor="green"><b>BLOQUES DIRECTOS</b></td></tr>
+            <tr><td bgcolor='lightgreen'>1</td><td>5</td></tr><tr><td bgcolor='lightgreen'>2</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>3</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>4</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>5</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>6</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>7</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>8</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>9</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>10</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>11</td><td>-1</td></tr><tr><td bgcolor='lightgreen'>12</td><td>-1</td></tr>
                 <tr><td colspan="2" bgcolor="yellow"><b>BLOQUES INDIRECTOS</b></td></tr>
                 <tr><td>Simple</td><td>-1</td></tr>
                 <tr><td>Doble</td><td>-1</td></tr>

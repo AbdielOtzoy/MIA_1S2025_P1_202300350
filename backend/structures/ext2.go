@@ -172,10 +172,116 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 	}
 
 	// Iterar sobre cada bloque del inodo (apuntadores)
-	for _, blockIndex := range inode.I_block {
+	for i, blockIndex := range inode.I_block {
 		// Si el bloque no existe, salir
 		if blockIndex == -1 {
-			break
+			fmt.Println("Ya no hay más bloques, creando uno nuevo")
+			// Crear un nuevo bloque de carpeta
+			newBlock := &FolderBlock{
+				B_content: [4]FolderContent{
+					{B_name: [12]byte{'.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'.', '.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+				},
+			}
+
+			// actualizar el bitmap de bloques
+			err = sb.UpdateBitmapBlock(path)
+			if err != nil {
+				return err
+			}
+
+			destDirByte := [12]byte{}
+			copy(destDirByte[:], destDir)
+			// Actualizar el contenido del bloque
+			newBlock.B_content[2] = FolderContent{B_name: destDirByte, B_inodo: sb.S_inodes_count}
+			fmt.Println("---------ESTOY  CREANDO--------")
+			// nuevo bloque
+			newBlock.Print()
+
+			// serializar el bloque
+			err = newBlock.Serialize(path, int64(sb.S_block_start+(int32(sb.S_blocks_count)*sb.S_block_size)))
+			if err != nil {
+				return err
+			}
+
+			// actualizar el inodo
+			inode.I_block[i] = sb.S_blocks_count
+
+			// Actualizar el superbloque
+			sb.S_blocks_count++
+			sb.S_free_blocks_count--
+			sb.S_first_blo += sb.S_block_size
+
+			// serializar el inodo
+			err = inode.Serialize(path, int64(sb.S_inode_start+(inodeIndex*sb.S_inode_size)))
+			if err != nil {
+				return err
+			}
+
+			// crear el inodo de la carpeta
+			folderInode := &Inode{
+				I_uid:   1,
+				I_gid:   1,
+				I_size:  0,
+				I_atime: float32(time.Now().Unix()),
+				I_ctime: float32(time.Now().Unix()),
+				I_mtime: float32(time.Now().Unix()),
+				I_block: [15]int32{sb.S_blocks_count, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+				I_type:  [1]byte{'0'},
+				I_perm:  [3]byte{'6', '6', '4'},
+			}
+			fmt.Println("nuevo inodo")
+			// serializar el inodo de la carpeta
+			err = folderInode.Serialize(path, int64(sb.S_first_ino))
+			if err != nil {
+				return err
+			}
+
+			// Actualizar el bitmap de inodos
+			err = sb.UpdateBitmapInode(path)
+			if err != nil {
+				return err
+			}
+
+			// Actualizar el superbloque
+			sb.S_inodes_count++
+			sb.S_free_inodes_count--
+			sb.S_first_ino += sb.S_inode_size
+
+			// crear el bloque de la carpeta
+			// Crear el bloque de la carpeta
+			folderBlock := &FolderBlock{
+				B_content: [4]FolderContent{
+					{B_name: [12]byte{'.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'.', '.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+				},
+			}
+
+			fmt.Println("nuevo bloque")
+			folderBlock.Print()
+
+			// Serializar el bloque de la carpeta
+			err = folderBlock.Serialize(path, int64(sb.S_first_blo))
+			if err != nil {
+				return err
+			}
+
+			// Actualizar el bitmap de bloques
+			err = sb.UpdateBitmapBlock(path)
+			if err != nil {
+				return err
+			}
+
+			// Actualizar el superbloque
+			sb.S_blocks_count++
+			sb.S_free_blocks_count--
+			sb.S_first_blo += sb.S_block_size
+
+			return nil
 		}
 
 		// Crear un nuevo bloque de carpeta
@@ -196,7 +302,7 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 
 			// Sí las carpetas padre no están vacías debereamos buscar la carpeta padre más cercana
 			if len(parentsDir) != 0 {
-				//fmt.Println("---------ESTOY  VISITANDO--------")
+				fmt.Println("---------ESTOY  VISITANDO--------")
 
 				// Si el contenido está vacío, salir
 				if content.B_inodo == -1 {
@@ -224,10 +330,16 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 					return nil
 				}
 			} else {
-				//fmt.Println("---------ESTOY  CREANDO--------")
+				fmt.Println("---------ESTOY  CREANDO--------")
+				fmt.Println("blockIndex: ", blockIndex)
+				fmt.Println("indexContent: ", indexContent)
+				fmt.Println("content: ", content.B_inodo )
+				fmt.Println(content.B_inodo != -1 && indexContent == 3)
+				fmt.Println("i:", i)
 
 				// Si el apuntador al inodo está ocupado, continuar con el siguiente
-				if content.B_inodo != -1 {
+				if content.B_inodo != -1  {
+					fmt.Println("Ya no hay espacio en el bloque")
 					continue
 				}
 
@@ -308,6 +420,7 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 	}
 	return nil
 }
+
 
 func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir []string, destDir string, r bool, size int, contentFile string) error {
 	// crear un nuevo inodo

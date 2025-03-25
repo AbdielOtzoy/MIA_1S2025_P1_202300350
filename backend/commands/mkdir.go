@@ -68,12 +68,13 @@ func ParseMkdir(tokens []string) (string, error) {
 	return fmt.Sprintf("MKDIR: Directorio %s creado correctamente.", cmd.path), nil // Devuelve el comando MKDIR creado
 }
 
-// TODO: Aquí debería de estar logeado un usuario, por lo cual el usuario debería tener consigo el id de la partición
-// En este caso el ID va a estar quemado
-
-
 func commandMkdir(mkdir *MKDIR) error {
-	partitionSuperblock, mountedPartition, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
+	// obtener la sesión activa
+	username, idPartitinUser := stores.GetSession()
+	if username == "" {
+		return errors.New("no hay sesión activa")
+	}
+	partitionSuperblock, mountedPartition, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartitinUser)
 	if err != nil {
 		return fmt.Errorf("error al obtener la partición montada: %w", err)
 	}
@@ -133,9 +134,6 @@ func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitio
 		return fmt.Errorf("error al crear el directorio: %w", err)
 	}
 
-	// Imprimir inodos y bloques
-	sb.PrintInodes(partitionPath)
-	sb.PrintBlocks(partitionPath)
 
 	// Serializar el superbloque
 	err = sb.Serialize(partitionPath, int64(mountedPartition.Part_start))

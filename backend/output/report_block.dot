@@ -7,44 +7,59 @@ digraph G {
 <tr><td>1: .</td></tr>
 <tr><td>2: ..</td></tr>
 <tr><td>3: users.txt</td></tr>
-<tr><td>4: -</td></tr>
+<tr><td>4: home</td></tr>
 </table>>];
 block1 [label=<
 <table border='0' cellborder='1' cellspacing='0'>
 <tr><td bgcolor='lightblue'><b>Block 1</b></td></tr>
 <tr><td>1,G,root
 1,U,root,root,123
-2,G,grupo1
-2,G,grupo2
-2,G,contactos
-2</td></tr>
+</td></tr>
 </table>>];
 block2 [label=<
 <table border='0' cellborder='1' cellspacing='0'>
 <tr><td bgcolor='lightblue'><b>Block 2</b></td></tr>
-<tr><td>,G,clientes
-0,G,usuarios
-2,G,usuarios2
-2,G,usuarios3
-2,G,usuario</td></tr>
+<tr><td>1: .</td></tr>
+<tr><td>2: ..</td></tr>
+<tr><td>3: usac</td></tr>
+<tr><td>4: dir1</td></tr>
+</table>>];
+block5 [label=<
+<table border='0' cellborder='1' cellspacing='0'>
+<tr><td bgcolor='lightblue'><b>Block 5</b></td></tr>
+<tr><td>1: .</td></tr>
+<tr><td>2: ..</td></tr>
+<tr><td>3: dir2</td></tr>
+<tr><td>4: -</td></tr>
 </table>>];
 block3 [label=<
 <table border='0' cellborder='1' cellspacing='0'>
 <tr><td bgcolor='lightblue'><b>Block 3</b></td></tr>
-<tr><td>s4
-1,U,grupo1,usuario1,123
-2,U,usuarios4,usuario2,123
-3,U,contac</td></tr>
+<tr><td>1: .</td></tr>
+<tr><td>2: ..</td></tr>
+<tr><td>3: -</td></tr>
+<tr><td>4: -</td></tr>
 </table>>];
 block4 [label=<
 <table border='0' cellborder='1' cellspacing='0'>
 <tr><td bgcolor='lightblue'><b>Block 4</b></td></tr>
-<tr><td>tos,usuario3,123
-4,U,clientes,usuario4,123
-</td></tr>
+<tr><td>1: .</td></tr>
+<tr><td>2: ..</td></tr>
+<tr><td>3: -</td></tr>
+<tr><td>4: -</td></tr>
+</table>>];
+block6 [label=<
+<table border='0' cellborder='1' cellspacing='0'>
+<tr><td bgcolor='lightblue'><b>Block 6</b></td></tr>
+<tr><td>1: .</td></tr>
+<tr><td>2: ..</td></tr>
+<tr><td>3: -</td></tr>
+<tr><td>4: -</td></tr>
 </table>>];
 block0 -> block1;
 block1 -> block2;
-block2 -> block3;
+block2 -> block5;
+block5 -> block3;
 block3 -> block4;
+block4 -> block6;
 }
