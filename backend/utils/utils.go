@@ -165,3 +165,17 @@ func ReplacePath(originalPath, newPath string) string {
 	
 	return newFullPath
 }
+
+// formatDate
+// 2025-03-26T09:19:28-06:00 to 2025-03-26 09:19:28
+func FormatDate(date string) (string, string) {
+	//devuelve la fecha y la hora
+	parts := strings.Split(date, "T")
+	if len(parts) != 2 {
+		return "", ""
+	}
+
+	datePart := parts[0]
+	timePart := strings.Split(parts[1], "-")[0]
+	return datePart, timePart
+}

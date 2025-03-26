@@ -138,6 +138,7 @@ func ReportMBR(mbr *structures.MBR, diskPath string, path string) error {
 	}
 
 	cmd := exec.Command("dot", "-Tpng", dotFileName, "-o", outputImage)
+	fmt.Println("Comando: ", cmd)
 	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("error al ejecutar el comando Graphviz: %v", err)

@@ -224,6 +224,15 @@ func (sb *SuperBlock) ReadFile(path string, parentsDir []string, destDir string)
 	return content, nil
 }
 
+func (sb* SuperBlock) GetInode(path string, parentsDir []string, destDir string)  (int32, error){
+	inode, err := sb.getInodeFromPath(path, 0, parentsDir, destDir)
+	if err != nil {
+		return -1, err
+	}
+
+	return inode, nil
+}
+
 func (sb *SuperBlock) LoginUser(user string, password string, path string) error {
 	err := sb.loginUserInInode(user, password, path)
 	if err != nil {

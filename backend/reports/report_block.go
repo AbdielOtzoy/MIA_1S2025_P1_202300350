@@ -49,17 +49,66 @@ func ReportBlock(superblock *structures.SuperBlock, diskPath string, path string
 		inode.Print()
 
 		// Iterar sobre cada bloque del inodo
-		for _, blockIndex := range inode.I_block {
+		for i, blockIndex := range inode.I_block {
 			if blockIndex == -1 {
 				break
 			}
 
 			// Nombre del bloque
 			blockName := fmt.Sprintf("block%d", blockIndex)
+			fmt.Println("Block name:", blockName)
 			blockNames = append(blockNames, blockName)
 
 			// Manejar bloques de carpeta
 			if inode.I_type[0] == '0' {
+				// Manejar bloques de apuntadores
+				if i == 12 || i == 13 || i == 14 {
+					fmt.Println("Pointer block")
+					block := &structures.PointerBlock{}
+					err := block.Deserialize(diskPath, int64(superblock.S_block_start+(blockIndex*superblock.S_block_size)))
+					if err != nil {
+						return err
+					}
+
+					fmt.Println("Block pointers:")
+					block.Print()
+
+					// Agregar la información del bloque
+					dotContent += fmt.Sprintf("%s [label=<\n", blockName)
+					dotContent += "<table border='0' cellborder='1' cellspacing='0'>\n"
+					dotContent += fmt.Sprintf("<tr><td bgcolor='lightblue'><b>Block %d</b></td></tr>\n", blockIndex)
+					
+					for j, pointer := range block.P_pointers {
+						dotContent += fmt.Sprintf("<tr><td>%d: %d</td></tr>\n", j+1, pointer)
+					}
+
+					dotContent += "</table>>];\n"
+
+					// graficar los bloques a los que apunta el bloque de apuntadores
+					for _, pointer := range block.P_pointers {
+						if pointer == -1 {
+							break
+						}
+						blockName := fmt.Sprintf("block%d", pointer)
+						dotContent += fmt.Sprintf("%s -> %s;\n", blockName, blockName)
+						blockNames = append(blockNames, blockName)
+						block := &structures.FolderBlock{}
+						err := block.Deserialize(diskPath, int64(superblock.S_block_start+(pointer*superblock.S_block_size)))
+						if err != nil {
+							return err
+						}
+						dotContent += fmt.Sprintf("%s [label=<\n", blockName)
+						dotContent += "<table border='0' cellborder='1' cellspacing='0'>\n"
+						dotContent += fmt.Sprintf("<tr><td bgcolor='lightblue'><b>Block %d</b></td></tr>\n", pointer)
+						for j, content := range block.B_content {
+							name := strings.TrimRight(string(content.B_name[:]), "\x00")
+							dotContent += fmt.Sprintf("<tr><td>%d: %s</td></tr>\n", j+1, escapeHTML(name))
+						}
+						dotContent += "</table>>];\n"
+						dotContent += fmt.Sprintf("%s -> %s;\n", blockName, blockName)
+					}
+					continue
+				}
 				fmt.Println("Folder block")
 				block := &structures.FolderBlock{}
 
@@ -116,8 +165,6 @@ func ReportBlock(superblock *structures.SuperBlock, diskPath string, path string
 	fmt.Println("Generating image...")
 
 	dotContent += "}"
-
-	fmt.Println(dotContent)
 
 	// Escribir el archivo DOT
 	dotFile, err := os.Create(dotFileName)

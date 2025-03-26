@@ -4,8 +4,8 @@ digraph G {
             <table border="0" cellborder="1" cellspacing="0">
                 <tr><td colspan="2" bgcolor="blue"><font color="white"><b>REPORTE MBR</b></font></td></tr>
                 <tr><td bgcolor="lightgray"><b>mbr_tamano</b></td><td>10485760</td></tr>
-                <tr><td bgcolor="lightgray"><b>mbr_fecha_creacion</b></td><td>2025-03-22 23:15:44 -0600 CST</td></tr>
-                <tr><td bgcolor="lightgray"><b>mbr_disk_signature</b></td><td>1672197023</td></tr>
+                <tr><td bgcolor="lightgray"><b>mbr_fecha_creacion</b></td><td>2025-03-26 09:19:28 -0600 CST</td></tr>
+                <tr><td bgcolor="lightgray"><b>mbr_disk_signature</b></td><td>1679938587</td></tr>
             
 				<tr><td colspan="2" bgcolor="yellow"><b>PARTICIÓN 1</b></td></tr>
 				<tr><td bgcolor="lightblue"><b>part_status</b></td><td>0</td></tr>
@@ -24,12 +24,12 @@ digraph G {
 				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>Particion2</td></tr>
 			
 				<tr><td colspan="2" bgcolor="yellow"><b>PARTICIÓN 3</b></td></tr>
-				<tr><td bgcolor="lightblue"><b>part_status</b></td><td>0</td></tr>
-				<tr><td bgcolor="lightblue"><b>part_type</b></td><td>E</td></tr>
-				<tr><td bgcolor="lightblue"><b>part_fit</b></td><td>B</td></tr>
-				<tr><td bgcolor="lightblue"><b>part_start</b></td><td>223</td></tr>
-				<tr><td bgcolor="lightblue"><b>part_size</b></td><td>1048576</td></tr>
-				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>Particion3e</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_status</b></td><td>N</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_type</b></td><td>N</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_fit</b></td><td>N</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_start</b></td><td>-1</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_size</b></td><td>-1</td></tr>
+				<tr><td bgcolor="lightblue"><b>part_name</b></td><td>N</td></tr>
 			
 				<tr><td colspan="2" bgcolor="yellow"><b>PARTICIÓN 4</b></td></tr>
 				<tr><td bgcolor="lightblue"><b>part_status</b></td><td>N</td></tr>

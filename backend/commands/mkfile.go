@@ -98,11 +98,16 @@ func ParseMKfile(tokens []string) (string, error) {
 	return fmt.Sprintf("MKFILE: Archivo %s creado correctamente.", cmd.path), nil // Devuelve el comando MKDIR creado
 }
 
-// TODO: Aquí debería de estar logeado un usuario, por lo cual el usuario debería tener consigo el id de la partición
-// En este caso el ID va a estar quemado
-
-
 func commandMkfile(mkfile *MKFILE) error {
+	// obtener la sesion
+	username, idPartition := stores.GetSession()
+	if username == "" || idPartition == "" {
+		return errors.New("no hay sesión activa")
+	}
+
+	if username != "root" {
+		return errors.New("no tiene permisos para crear archivos")
+	}
 	partitionSuperblock, mountedPartition, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
 	if err != nil {
 		return fmt.Errorf("error al obtener la partición montada: %w", err)

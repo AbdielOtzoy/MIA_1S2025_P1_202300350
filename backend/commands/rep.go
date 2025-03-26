@@ -143,6 +143,12 @@ func commandRep(rep *REP) (string, error) {
 		}
 
 		return fmt.Sprintf("Tree report generated at %s", rep.path), nil
+	case "ls":
+		err = reports.ReportLS(mountedSb, mountedDiskPath, rep.path, rep.path_file_ls)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+		return fmt.Sprintf("LS report generated at %s", rep.path), nil
 
 	}
 

@@ -120,9 +120,6 @@ func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitio
 				return fmt.Errorf("error al crear la carpeta: %w", err)
 			}
 
-			fmt.Println("Inodos y bloques")
-			sb.PrintInodes(partitionPath)
-			sb.PrintBlocks(partitionPath)
 
 			fmt.Println("Carpeta creada correctamente")
 		}

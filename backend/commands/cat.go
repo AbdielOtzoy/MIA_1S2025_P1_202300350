@@ -58,21 +58,16 @@ func ParseCat(tokens []string) (string, error) {
 	return fmt.Sprintf("Se han mostrado los archivos: %s", message), nil
 }
 
-// TODO: Aquí debería de estar logeado un usuario, por lo cual el usuario debería tener consigo el id de la partición
-// En este caso el ID va a estar quemado
-var idPartition = "501A"
-
-// este comando podra mostrar el contenido de un archivo
-// 1. leer el superbloque de la partición
-// 2. leer el inodo del archivo
-// 3. leer todos los bloques del inodo y buscar el archivo
-// 4. leer el contenido del archivo
-// 5. mostrar el contenido del archivo
-// 6. si el archivo no existe, mostrar un mensaje de error
-
 // el cmd.files es una ruta, ir desapilando la ruta hasta llegar al archivo
 // usando recursividad
 func commandCat(cmd *CAT) (string, error) {
+
+	// obtener la sesión activa
+	username, idPartition := stores.GetSession()
+	if username == "" || idPartition == "" {
+		return "", errors.New("no hay sesión activa")
+	}
+
 	sb, _, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
 	if err != nil {
 		return "", fmt.Errorf("error al obtener el superbloque: %w", err)

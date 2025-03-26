@@ -1,0 +1,271 @@
+digraph G {
+		node [shape=plaintext]
+		tabla [label=<
+			<table border="0" cellborder="1" cellspacing="0">
+				<tr><td colspan="5" bgcolor="blue"><font color="white"><b>REPORTE LS</b></font></td></tr>
+				<tr><td bgcolor="lightgray"><b>Nombre</b></td><td bgcolor="lightgray"><b>UID</b></td><td bgcolor="lightgray"><b>GID</b></td><td bgcolor="lightgray"><b>Size</b></td><td bgcolor="lightgray"><b>Tipo</b></td><td bgcolor="lightgray"><b>Fecha</b></td><td bgcolor="lightgray"><b>Hora</b></td><td bgcolor="lightgray"><b>Permisos</b></td></tr>
+	
+				<tr>
+					<td>dir1</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir2</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir3</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir4</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir5</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir6</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir7</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir8</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir9</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir10</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir11</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir12</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir13</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir14</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir15</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir16</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir17</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir18</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir19</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir20</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir21</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir22</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir23</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			
+				<tr>
+					<td>dir24</td>
+					<td>1</td>
+					<td>1</td>
+					<td>0</td>
+					<td>Carpeta</td>
+					<td>2025-03-26</td>
+					<td>09:19:28</td>
+					<td>664</td>
+				</tr>
+			</table>>] }
