@@ -11,16 +11,20 @@ var (
 	MountedPartitions map[string]string = make(map[string]string)
 	userNameLogged string = ""
 	idMountedPartition string = ""
+	userid int32 = -1
+	groupid int32 = -1
 
 )
 
-func SetSession(user string, idPartition string) {
+func SetSession(user string, idPartition string, uid int32, gid int32) {
 	userNameLogged = user
 	idMountedPartition = idPartition
+	userid = uid
+	groupid = gid
 }
 
-func GetSession() (string, string) {	
-	return userNameLogged, idMountedPartition
+func GetSession() (string, string, int32, int32) {	
+	return userNameLogged, idMountedPartition, userid, groupid
 }
 
 

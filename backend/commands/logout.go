@@ -16,13 +16,13 @@ func ParseLogout(tokens []string) (string, error) {
 	}
 
 	// check if a session is active
-	username, _ := stores.GetSession()
+	username, _, _, _ := stores.GetSession()
 	if username == "" {
 		return "No hay sesión activa", nil
 	}
 
 	// clear the session
-	stores.SetSession("", "")
+	stores.SetSession("", "", -1, -1)
 
 	return "Sesión cerrada", nil
 

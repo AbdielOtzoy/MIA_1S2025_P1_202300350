@@ -70,7 +70,7 @@ func ParseMkdir(tokens []string) (string, error) {
 
 func commandMkdir(mkdir *MKDIR) error {
 	// obtener la sesión activa
-	username, idPartitinUser := stores.GetSession()
+	username, idPartitinUser, uid, gid := stores.GetSession()
 	if username == "" {
 		return errors.New("no hay sesión activa")
 	}
@@ -80,7 +80,7 @@ func commandMkdir(mkdir *MKDIR) error {
 	}
 
 	// Crear el directorio
-	err = createDirectory(mkdir.path, mkdir.p, partitionSuperblock, partitionPath, mountedPartition)
+	err = createDirectory(mkdir.path, mkdir.p, partitionSuperblock, partitionPath, mountedPartition, uid, gid)
 	if err != nil {
 		err = fmt.Errorf("error al crear el directorio: %w", err)
 	}
@@ -88,8 +88,7 @@ func commandMkdir(mkdir *MKDIR) error {
 	return err
 }
 
-func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitionPath string, mountedPartition *structures.Partition) error {
-	fmt.Println("\nCreando directorio:", dirPath)
+func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitionPath string, mountedPartition *structures.Partition, uid int32, gid int32) error {
 
 	parentDirs, destDir := utils.GetParentDirectories(dirPath)
 	fmt.Println("\nDirectorios padres:", parentDirs)
@@ -115,7 +114,7 @@ func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitio
 			}
 
 			fmt.Printf("Creando la carpeta %s\n", path)
-			err = sb.CreateFolder(partitionPath, parentsDir, destDir)
+			err = sb.CreateFolder(partitionPath, parentsDir, destDir, uid, gid)
 			if err != nil {
 				return fmt.Errorf("error al crear la carpeta: %w", err)
 			}
@@ -126,7 +125,7 @@ func createDirectory(dirPath string, p bool, sb *structures.SuperBlock, partitio
 	}
 
 	// Crear el directorio segun el path proporcionado
-	err := sb.CreateFolder(partitionPath, parentDirs, destDir)
+	err := sb.CreateFolder(partitionPath, parentDirs, destDir, uid, gid)
 	if err != nil {
 		return fmt.Errorf("error al crear el directorio: %w", err)
 	}

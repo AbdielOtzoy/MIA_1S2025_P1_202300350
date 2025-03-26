@@ -8,7 +8,7 @@ import (
 )
 
 // createFolderInInode crea una carpeta en un inodo específico
-func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parentsDir []string, destDir string) error {
+func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parentsDir []string, destDir string, uid int32, gid int32) error {
 	// Crear un nuevo inodo
 	inode := &Inode{}
 	// Deserializar el inodo
@@ -70,8 +70,8 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 
 			// 2. Crear el inodo de la nueva carpeta
 			folderInode := &Inode{
-				I_uid:   1,
-				I_gid:   1,
+				I_uid:   uid,
+				I_gid:   gid,
 				I_size:  0,
 				I_atime: float32(time.Now().Unix()),
 				I_ctime: float32(time.Now().Unix()),
@@ -222,7 +222,7 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 				if strings.EqualFold(contentName, parentDirName) {
 					//fmt.Println("---------LA ENCONTRÉ-------")
 					// Si son las mismas, entonces entramos al inodo que apunta el bloque
-					err := sb.createFolderInInode(path, content.B_inodo, utils.RemoveElement(parentsDir, 0), destDir)
+					err := sb.createFolderInInode(path, content.B_inodo, utils.RemoveElement(parentsDir, 0), destDir, uid, gid)
 					if err != nil {
 						return err
 					}
@@ -282,8 +282,8 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 
 									// crear el inodo de la carpeta
 									folderInode := &Inode{
-										I_uid:   1,
-										I_gid:   1,
+										I_uid:   uid,
+										I_gid:   gid,
 										I_size:  0,
 										I_atime: float32(time.Now().Unix()),
 										I_ctime: float32(time.Now().Unix()),
@@ -373,8 +373,8 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 
 							// 2. Crear el inodo de la nueva carpeta
 							folderInode := &Inode{
-								I_uid:   1,
-								I_gid:   1,
+								I_uid:   uid,
+								I_gid:   gid,
 								I_size:  0,
 								I_atime: float32(time.Now().Unix()),
 								I_ctime: float32(time.Now().Unix()),
@@ -455,8 +455,8 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 
 				// Crear el inodo de la carpeta
 				folderInode := &Inode{
-					I_uid:   1,
-					I_gid:   1,
+					I_uid:   uid,
+					I_gid:   gid,
 					I_size:  0,
 					I_atime: float32(time.Now().Unix()),
 					I_ctime: float32(time.Now().Unix()),

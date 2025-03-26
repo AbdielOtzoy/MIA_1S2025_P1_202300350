@@ -179,3 +179,15 @@ func FormatDate(date string) (string, string) {
 	timePart := strings.Split(parts[1], "-")[0]
 	return datePart, timePart
 }
+
+func StringToInt32(s string) int32 {
+	var result int32
+	for _, char := range s {
+		if char >= '0' && char <= '9' {
+			result = result*10 + int32(char-'0')
+		} else {
+			return 0
+		}
+	}
+	return result
+}

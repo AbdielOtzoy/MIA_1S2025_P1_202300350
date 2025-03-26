@@ -55,7 +55,7 @@ func ParseRmgroup(tokens []string) (string, error) {
 
 func removeGroup(name string) string {
 	// get the current session
-	userName, idPartition := stores.GetSession()
+	userName, idPartition, _, _  := stores.GetSession()
 	if userName == "" {
 		return "No hay sesión activa"
 	}

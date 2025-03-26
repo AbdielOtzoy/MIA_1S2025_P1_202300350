@@ -63,7 +63,7 @@ func ParseCat(tokens []string) (string, error) {
 func commandCat(cmd *CAT) (string, error) {
 
 	// obtener la sesión activa
-	username, idPartition := stores.GetSession()
+	username, idPartition,_, _ := stores.GetSession()
 	if username == "" || idPartition == "" {
 		return "", errors.New("no hay sesión activa")
 	}

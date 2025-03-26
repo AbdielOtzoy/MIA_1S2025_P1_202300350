@@ -77,7 +77,7 @@ func ParseMkuser(tokens []string) (string, error) {
 
 func createUser(user string, pass string, group string) string {
 	// get the current session
-	userName, idPartition := stores.GetSession()
+	userName, idPartition, _, _ := stores.GetSession()
 	if userName == "" {
 		return "No hay sesión activa"
 	}

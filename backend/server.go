@@ -52,7 +52,7 @@ func main() {
 		output := ""
 
 		for _, cmd := range commands {
-			if strings.TrimSpace(cmd) == "" {
+			if strings.TrimSpace(cmd) == "" || strings.HasPrefix(cmd, "#") {
 				continue
 			}
 

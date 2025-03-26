@@ -100,13 +100,9 @@ func ParseMKfile(tokens []string) (string, error) {
 
 func commandMkfile(mkfile *MKFILE) error {
 	// obtener la sesion
-	username, idPartition := stores.GetSession()
+	username, idPartition, uid, gid := stores.GetSession()
 	if username == "" || idPartition == "" {
 		return errors.New("no hay sesión activa")
-	}
-
-	if username != "root" {
-		return errors.New("no tiene permisos para crear archivos")
 	}
 	partitionSuperblock, mountedPartition, partitionPath, err := stores.GetMountedPartitionSuperblock(idPartition)
 	if err != nil {
@@ -114,7 +110,7 @@ func commandMkfile(mkfile *MKFILE) error {
 	}
 
 	// Crear el archivo
-	err = createFile(mkfile.path, mkfile.r, mkfile.size, mkfile.cont, partitionSuperblock, partitionPath, mountedPartition)
+	err = createFile(mkfile.path, mkfile.r, mkfile.size, mkfile.cont, partitionSuperblock, partitionPath, mountedPartition, uid, gid)
 	if err != nil {
 		err = fmt.Errorf("error al crear el directorio: %w", err)
 	}
@@ -122,7 +118,7 @@ func commandMkfile(mkfile *MKFILE) error {
 	return err
 }
 
-func createFile(dirPath string, r bool, size int, contentPath string, sb *structures.SuperBlock, partitionPath string, mountedPartition *structures.Partition) error {
+func createFile(dirPath string, r bool, size int, contentPath string, sb *structures.SuperBlock, partitionPath string, mountedPartition *structures.Partition, uid int32, gid int32) error {
 	fmt.Println("\nCreando directorio:", dirPath)
 	fmt.Println("Recursivo:", r)
 	fmt.Println("Tamaño:", size)
@@ -162,7 +158,7 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 			}
 
 			fmt.Printf("Creando la carpeta %s\n", path)
-			err = sb.CreateFolder(partitionPath, parentsDir, destDir)
+			err = sb.CreateFolder(partitionPath, parentsDir, destDir, uid, gid)
 			if err != nil {
 				return fmt.Errorf("error al crear la carpeta: %w", err)
 			}
@@ -176,7 +172,7 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 	}
 
 	// Crear el directorio segun el path proporcionado
-	err = sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile)
+	err = sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile, uid, gid)
 	if err != nil {
 		return fmt.Errorf("error al crear el directorio: %w", err)
 	}

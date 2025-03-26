@@ -194,14 +194,14 @@ func (sb *SuperBlock) PrintBlocks(path string) error {
 }
 
 // CreateFolder crea una carpeta en el sistema de archivos
-func (sb *SuperBlock) CreateFolder(path string, parentsDir []string, destDir string) error {
-	return sb.createFolderInInode(path, 0, parentsDir, destDir)
+func (sb *SuperBlock) CreateFolder(path string, parentsDir []string, destDir string, uid int32, gid int32) error {
+	return sb.createFolderInInode(path, 0, parentsDir, destDir, uid, gid)
 
 }
 
 // CreateFile crea un archivo en el sistema de archivos
-func (sb *SuperBlock) CreateFile(path string, parentsDir []string, destDir string, r bool, size int, content string) error {
-	return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content)
+func (sb *SuperBlock) CreateFile(path string, parentsDir []string, destDir string, r bool, size int, content string, uid int32, gid int32) error {
+	return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content, uid, gid)
 }
 
 func (sb *SuperBlock) ExistsFolcer(path string, parentsDir []string, destDir string) (bool, error) {
@@ -233,13 +233,13 @@ func (sb* SuperBlock) GetInode(path string, parentsDir []string, destDir string)
 	return inode, nil
 }
 
-func (sb *SuperBlock) LoginUser(user string, password string, path string) error {
-	err := sb.loginUserInInode(user, password, path)
+func (sb *SuperBlock) LoginUser(user string, password string, path string) (int32, int32,error) {
+	uid, gid, err := sb.loginUserInInode(user, password, path)
 	if err != nil {
-		return err
+		return -1, -1, err
 	}
 
-	return nil
+	return uid, gid, nil
 }
 
 func (sb *SuperBlock) CreateGroup(name string, path string) error {

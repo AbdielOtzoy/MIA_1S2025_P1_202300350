@@ -157,181 +157,8 @@ func (sb *SuperBlock) CreateUsersFile(path string) error {
 	return nil
 }
 
-func (sb *SuperBlock) createFolderInode(path string, parentInode int32, name string) (int32, error) {
-    // 1. Crear el inodo de la carpeta
-    folderInode := &Inode{
-        I_uid:   1,
-        I_gid:   1,
-        I_size:  0,
-        I_atime: float32(time.Now().Unix()),
-        I_ctime: float32(time.Now().Unix()),
-        I_mtime: float32(time.Now().Unix()),
-        I_block: [15]int32{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-        I_type:  [1]byte{'0'},
-        I_perm:  [3]byte{'6', '6', '4'},
-    }
 
-    // Serializar el inodo
-    inodePos := sb.S_first_ino
-    err := folderInode.Serialize(path, int64(sb.S_inode_start+(inodePos*sb.S_inode_size)))
-    if err != nil {
-        return -1, fmt.Errorf("error al serializar inodo: %v", err)
-    }
-
-    // Actualizar bitmap de inodos
-    if err := sb.UpdateBitmapInode(path); err != nil {
-        return -1, fmt.Errorf("error al actualizar bitmap de inodos: %v", err)
-    }
-
-    // Actualizar superbloque
-    sb.S_inodes_count++
-    sb.S_free_inodes_count--
-    sb.S_first_ino += sb.S_inode_size
-
-    // 2. Crear el bloque básico de la carpeta
-    folderBlock := &FolderBlock{
-        B_content: [4]FolderContent{
-            {B_name: [12]byte{'.'}, B_inodo: inodePos},          // Apunta a sí mismo
-            {B_name: [12]byte{'.', '.'}, B_inodo: parentInode},  // Apunta al padre
-            {B_name: [12]byte{'-'}, B_inodo: -1},
-            {B_name: [12]byte{'-'}, B_inodo: -1},
-        },
-    }
-
-    // Si se proporcionó un nombre, agregarlo al bloque
-    if name != "" {
-        nameBytes := [12]byte{}
-        copy(nameBytes[:], name)
-        folderBlock.B_content[2] = FolderContent{B_name: nameBytes, B_inodo: -1}
-    }
-
-    // Serializar el bloque
-    blockPos := sb.S_blocks_count
-    err = folderBlock.Serialize(path, int64(sb.S_block_start+(blockPos*sb.S_block_size)))
-    if err != nil {
-        return -1, fmt.Errorf("error al serializar bloque: %v", err)
-    }
-
-    // Actualizar bitmap de bloques
-    if err := sb.UpdateBitmapBlock(path); err != nil {
-        return -1, fmt.Errorf("error al actualizar bitmap de bloques: %v", err)
-    }
-
-    // Actualizar superbloque
-    sb.S_blocks_count++
-    sb.S_free_blocks_count--
-    sb.S_first_blo += sb.S_block_size
-
-    // Asignar el bloque al inodo
-    folderInode.I_block[0] = blockPos
-    err = folderInode.Serialize(path, int64(sb.S_inode_start+(inodePos*sb.S_inode_size)))
-    if err != nil {
-        return -1, fmt.Errorf("error al actualizar inodo con bloque: %v", err)
-    }
-
-    return inodePos, nil
-}
-
-func (sb *SuperBlock) createFolderWithEntry(path string, parentInode int32, dirName string, targetBlock int32) (int32, error) {
-    // 1. Crear el inodo y bloque básico de la carpeta
-    newInode, err := sb.createFolderInode(path, parentInode, "")
-    if err != nil {
-        return -1, fmt.Errorf("error al crear inodo base: %v", err)
-    }
-
-    // 2. Crear o actualizar el bloque que contendrá la entrada
-    var blockPos int32
-    var folderBlock *FolderBlock
-
-    if targetBlock == -1 {
-        // Crear nuevo bloque para el directorio padre
-        folderBlock = &FolderBlock{
-            B_content: [4]FolderContent{
-                {B_name: [12]byte{'.'}, B_inodo: parentInode},
-                {B_name: [12]byte{'.', '.'}, B_inodo: parentInode},
-                {B_name: [12]byte{}, B_inodo: newInode},
-                {B_name: [12]byte{'-'}, B_inodo: -1},
-            },
-        }
-        copy(folderBlock.B_content[2].B_name[:], dirName)
-
-        blockPos = sb.S_blocks_count
-        err = folderBlock.Serialize(path, int64(sb.S_block_start+(blockPos*sb.S_block_size)))
-        if err != nil {
-            return -1, fmt.Errorf("error al serializar nuevo bloque: %v", err)
-        }
-
-        // Actualizar superbloque
-        sb.S_blocks_count++
-        sb.S_free_blocks_count--
-        sb.S_first_blo += sb.S_block_size
-    } else {
-        // Usar bloque existente
-        folderBlock = &FolderBlock{}
-        err := folderBlock.Deserialize(path, int64(sb.S_block_start+(targetBlock*sb.S_block_size)))
-        if err != nil {
-            return -1, fmt.Errorf("error al leer bloque existente: %v", err)
-        }
-
-        // Buscar espacio libre en el bloque
-        found := false
-        for i := 2; i < 4; i++ {
-            if folderBlock.B_content[i].B_inodo == -1 {
-                copy(folderBlock.B_content[i].B_name[:], dirName)
-                folderBlock.B_content[i].B_inodo = newInode
-                found = true
-                break
-            }
-        }
-
-        if !found {
-            return -1, fmt.Errorf("no hay espacio en el bloque para nueva entrada")
-        }
-
-        blockPos = targetBlock
-        err = folderBlock.Serialize(path, int64(sb.S_block_start+(blockPos*sb.S_block_size)))
-        if err != nil {
-            return -1, fmt.Errorf("error al actualizar bloque existente: %v", err)
-        }
-    }
-
-    // 3. Actualizar bitmap de bloques
-    if err := sb.UpdateBitmapBlock(path); err != nil {
-        return -1, fmt.Errorf("error al actualizar bitmap de bloques: %v", err)
-    }
-
-    // 4. Actualizar inodo padre si es necesario
-    if targetBlock == -1 {
-        parentInodeObj := &Inode{}
-        err := parentInodeObj.Deserialize(path, int64(sb.S_inode_start+(parentInode*sb.S_inode_size)))
-        if err != nil {
-            return -1, fmt.Errorf("error al leer inodo padre: %v", err)
-        }
-
-        // Buscar espacio en los bloques del inodo padre
-        added := false
-        for i := 0; i < 15; i++ {
-            if parentInodeObj.I_block[i] == -1 {
-                parentInodeObj.I_block[i] = blockPos
-                added = true
-                break
-            }
-        }
-
-        if !added {
-            return -1, fmt.Errorf("no hay espacio en el inodo padre para nuevo bloque")
-        }
-
-        err = parentInodeObj.Serialize(path, int64(sb.S_inode_start+(parentInode*sb.S_inode_size)))
-        if err != nil {
-            return -1, fmt.Errorf("error al actualizar inodo padre: %v", err)
-        }
-    }
-
-    return newInode, nil
-}
-
-func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir []string, destDir string, r bool, size int, contentFile string) error {
+func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir []string, destDir string, r bool, size int, contentFile string, uid int32, gid int32) error {
 	// crear un nuevo inodo
 	inode := &Inode{}
 	// deserializar el inodo
@@ -381,7 +208,7 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 				parentDirName := strings.Trim(parentDir, "\x00 ")
 				// Si el nombre del contenido coincide con el nombre de la carpeta padre
 				if strings.EqualFold(contentName, parentDirName) {
-					err := sb.createFileInode(path, content.B_inodo, utils.RemoveElement(parentsDir, 0), destDir, r, size, contentFile)
+					err := sb.createFileInode(path, content.B_inodo, utils.RemoveElement(parentsDir, 0), destDir, r, size, contentFile, uid, gid)
 					if err != nil {
 						return err
 					}
@@ -408,8 +235,8 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 				// Crear el inodo del archivo
 				// Crear el inodo de la carpeta
 				fileInode := &Inode{
-					I_uid:   1,
-					I_gid:   1,
+					I_uid:   uid,
+					I_gid:   gid,
 					I_size:  int32(size),
 					I_atime: float32(time.Now().Unix()),
 					I_ctime: float32(time.Now().Unix()),
@@ -738,7 +565,7 @@ func (sb *SuperBlock) getInodeFromPath(path string, inodeIndex int32, parentsDir
     return -1, fmt.Errorf("no se encontró el inodo para '%s'", targetName)
 }
 
-func (sb *SuperBlock) loginUserInInode(user string, password string, path string) error {
+func (sb *SuperBlock) loginUserInInode(user string, password string, path string) (int32, int32, error) {
 	// obtener el contenido del bloque
 	content := sb.getUsersContent(path)
 
@@ -772,6 +599,9 @@ func (sb *SuperBlock) loginUserInInode(user string, password string, path string
 
 	fmt.Println("Contenido login: ", content)
 
+	uid := int32(0)
+	gid := int32(0)
+	grupoUsuario := ""
 	// iterar sobre cada linea
 	for _, line := range lines {
 		// separar la linea por comas
@@ -785,11 +615,6 @@ func (sb *SuperBlock) loginUserInInode(user string, password string, path string
 
 		fmt.Println("Partes: ", parts)
 		
-
-		// verificar si es un grupo
-		if parts[1] == "G" {
-			fmt.Println("Grupo: ", parts[2])
-		}
 		// verificar si es un usuario
 		if parts[1] == "U" {
 			fmt.Println("Usuario: ", parts[3])
@@ -797,20 +622,32 @@ func (sb *SuperBlock) loginUserInInode(user string, password string, path string
 			if parts[3] == user && parts[4] == password {
 				fmt.Println("Usuario: ", parts[3])
 				fmt.Println("Contraseña: ", parts[4])
-				return nil
+				uid = utils.StringToInt32(parts[0])
+				grupoUsuario = parts[2]
 			} else if parts[3] == user && parts[4] != password {
 				fmt.Println("Contraseña incorrecta")
-				return fmt.Errorf("contraseña incorrecta")
-			} else {
-				fmt.Println("Usuario o contraseña incorrectos")
+				return 0, 0, fmt.Errorf("contraseña incorrecta")
 			}
 		}
-
-
-
 	}
 
-	return fmt.Errorf("no se encontró el usuario")
+	// iterar para buscar el grupo
+	for _, line := range lines {
+		// separar la linea por comas
+		parts := strings.Split(line, ",")
+		// verificar si es un grupo
+		if parts[1] == "G" {
+			fmt.Println("Grupo: ", parts[2])
+			if parts[2] == grupoUsuario {
+				fmt.Println("Grupo: ", parts[2])
+				gid = utils.StringToInt32(parts[0])
+				fmt.Println("GID: ", gid)
+				return uid, gid, nil
+			}
+		}
+	}
+
+	return 0, 0, fmt.Errorf("usuario o contraseña incorrectos")  
 
 }
 
@@ -854,7 +691,7 @@ func (sb *SuperBlock) createGroupInInode(name string, path string) error {
         lines = lines[:len(lines)-1]
     }
 
-    // Resto del código para verificar si el grupo existe...
+    countGrupos := 0
     for _, line := range lines {
         parts := strings.Split(line, ",")
         
@@ -862,6 +699,7 @@ func (sb *SuperBlock) createGroupInInode(name string, path string) error {
         
         if len(parts) > 1 && parts[1] == "G" {
             fmt.Println("Grupo: ", parts[2])
+			countGrupos++
             if parts[2] == name {
                 fmt.Println("Grupo ya existe")
                 return fmt.Errorf("grupo ya existe")
@@ -870,7 +708,7 @@ func (sb *SuperBlock) createGroupInInode(name string, path string) error {
     }
 
     // Si el grupo no existe, agregarlo
-    newGrupo := fmt.Sprintf("%d,G,%s\n", sb.S_inodes_count, name)
+    newGrupo := fmt.Sprintf("%d,G,%s\n", countGrupos+1, name)
     newContent := content + newGrupo
     fmt.Println("Nuevo grupo: ", newGrupo)
     fmt.Println("Contenido nuevo: ", newContent)
@@ -1028,11 +866,12 @@ func (sb *SuperBlock) createUserInInode(user string, pass string, grp string, pa
 		
 		if len(parts) > 1 && parts[1] == "U" {
 			fmt.Println("Usuario: ", parts[3])
+			userCount++
 			if parts[3] == user {
 				fmt.Println("Usuario ya existe")
 				return fmt.Errorf("usuario ya existe")
 			}
-			userCount++
+			
 		}
 		// verificar si es un grupo
 		if len(parts) > 1 && parts[1] == "G" {
@@ -1055,7 +894,7 @@ func (sb *SuperBlock) createUserInInode(user string, pass string, grp string, pa
 	}
 
 	// agregar el nuevo usuario: userCount, U, grp, user, pass
-	newUser := fmt.Sprintf("%d,U,%s,%s,%s\n", userCount, grp, user, pass)
+	newUser := fmt.Sprintf("%d,U,%s,%s,%s\n", userCount+1, grp, user, pass)
 	newContent := content + newUser
 	fmt.Println("Nuevo usuario: ", newUser)
 	fmt.Println("Contenido nuevo: ", newContent)

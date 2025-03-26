@@ -87,7 +87,7 @@ func ParseLogin(tokens []string) (string, error) {
 }
 
 func commandLogin(cmd *LOGIN) error {
-	userLogged, _ := stores.GetSession();
+	userLogged, _, _, _ := stores.GetSession();
 	if userLogged != "" {
 		return errors.New("ya hay un usuario logueado")
 	}
@@ -97,14 +97,14 @@ func commandLogin(cmd *LOGIN) error {
 		return fmt.Errorf("error al obtener la partición montada: %w", err)
 	}
 
-	err = partitionSuperblock.LoginUser(cmd.user, cmd.pass, partitionPath)
+	uid, gid, err := partitionSuperblock.LoginUser(cmd.user, cmd.pass, partitionPath)
 
 	if err != nil {
 		return fmt.Errorf("error al loguear el usuario: %w", err)
 	}
 
 	// si no hay error, loguear el usuario
-	stores.SetSession(cmd.user, cmd.id)	
+	stores.SetSession(cmd.user, cmd.id, uid, gid)
 
 	return nil
 }
