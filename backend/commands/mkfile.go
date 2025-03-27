@@ -112,7 +112,7 @@ func commandMkfile(mkfile *MKFILE) error {
 	// Crear el archivo
 	err = createFile(mkfile.path, mkfile.r, mkfile.size, mkfile.cont, partitionSuperblock, partitionPath, mountedPartition, uid, gid)
 	if err != nil {
-		err = fmt.Errorf("error al crear el directorio: %w", err)
+		err = fmt.Errorf("error al crear el archivo: %w", err)
 	}
 
 	return err
@@ -128,15 +128,20 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 	fmt.Println("\nDirectorios padres:", parentDirs)
 	fmt.Println("Directorio destino:", destDir)
 
-	contentFile, err := utils.GetFileContent(contentPath)
-	if err != nil {
+
+	contentFile := ""
+	if contentPath != "" {
+		contentFile, err := utils.GetFileContent(contentPath)
+		if err != nil {
 		return fmt.Errorf("error al obtener el contenido del archivo: %w", err)
+		}
+		if contentFile != "" {
+			fmt.Println("Contenido del archivo:", contentFile)
+		} else {
+			fmt.Println("No se encontró el archivo de contenido.")
+		}
 	}
-	if contentFile != "" {
-		fmt.Println("Contenido del archivo:", contentFile)
-	} else {
-		fmt.Println("No se encontró el archivo de contenido.")
-	}
+	
 
 	if r {
 		fmt.Println("Opción -r activada")
@@ -172,7 +177,7 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 	}
 
 	// Crear el directorio segun el path proporcionado
-	err = sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile, uid, gid)
+	err := sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile, uid, gid)
 	if err != nil {
 		return fmt.Errorf("error al crear el directorio: %w", err)
 	}

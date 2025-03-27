@@ -64,7 +64,7 @@ digraph G {
 			<tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
 			<tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
 			<tr><td colspan="2" bgcolor="lightgreen"><b>Bloques Directos</b></td></tr>
-	<tr><td>0</td><td>2</td></tr><tr><td>1</td><td>-1</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
+	<tr><td>0</td><td>2</td></tr><tr><td>1</td><td>6</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
 			<tr><td colspan="2" bgcolor="lightyellow"><b>Bloques Indirectos</b></td></tr>
 			<tr><td>Simple</td><td>-1</td></tr>
 			<tr><td>Doble</td><td>-1</td></tr>
@@ -88,7 +88,30 @@ digraph G {
 			<tr><td>Doble</td><td>-1</td></tr>
 			<tr><td>Triple</td><td>-1</td></tr>
 		</table>>];
-	block3 [label=<
+	inode8 [label=<
+		<table border="0" cellborder="1" cellspacing="0">
+			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 8</b></font></td></tr>
+			<tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_size</b></td><td>32</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-26T18:19:12-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-26T18:19:12-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-26T18:19:12-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_type</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+			<tr><td colspan="2" bgcolor="lightgreen"><b>Bloques Directos</b></td></tr>
+	<tr><td>0</td><td>10</td></tr><tr><td>1</td><td>-1</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
+			<tr><td colspan="2" bgcolor="lightyellow"><b>Bloques Indirectos</b></td></tr>
+			<tr><td>Simple</td><td>-1</td></tr>
+			<tr><td>Doble</td><td>-1</td></tr>
+			<tr><td>Triple</td><td>-1</td></tr>
+		</table>>];
+	block10 [label=<
+				<table border="0" cellborder="1" cellspacing="0">
+					<tr><td bgcolor="lightblue"><b>Bloque Archivo 10</b></td></tr>
+					<tr><td></td></tr>
+				</table>>];
+			block3 [label=<
 				<table border="0" cellborder="1" cellspacing="0">
 					<tr><td colspan="4" bgcolor="lightgreen"><b>Bloque Carpeta 3</b></td></tr>
 					<tr>
@@ -103,7 +126,14 @@ digraph G {
 						<td>.</td>
 						<td>3</td>
 						<td>Carpeta</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>compi2.txt</td>
+						<td>8</td>
+						<td>Archivo</td>
 					</tr></table>>];
+inode8 -> block10 [color=black];
 inode4 [label=<
 		<table border="0" cellborder="1" cellspacing="0">
 			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 4</b></font></td></tr>
@@ -138,6 +168,100 @@ inode4 [label=<
 						<td>4</td>
 						<td>Carpeta</td>
 					</tr></table>>];
+inode5 [label=<
+		<table border="0" cellborder="1" cellspacing="0">
+			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 5</b></font></td></tr>
+			<tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_type</b></td><td>0</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+			<tr><td colspan="2" bgcolor="lightgreen"><b>Bloques Directos</b></td></tr>
+	<tr><td>0</td><td>7</td></tr><tr><td>1</td><td>-1</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
+			<tr><td colspan="2" bgcolor="lightyellow"><b>Bloques Indirectos</b></td></tr>
+			<tr><td>Simple</td><td>-1</td></tr>
+			<tr><td>Doble</td><td>-1</td></tr>
+			<tr><td>Triple</td><td>-1</td></tr>
+		</table>>];
+	inode6 [label=<
+		<table border="0" cellborder="1" cellspacing="0">
+			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 6</b></font></td></tr>
+			<tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-26T18:08:32-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_type</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+			<tr><td colspan="2" bgcolor="lightgreen"><b>Bloques Directos</b></td></tr>
+	<tr><td>0</td><td>8</td></tr><tr><td>1</td><td>-1</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
+			<tr><td colspan="2" bgcolor="lightyellow"><b>Bloques Indirectos</b></td></tr>
+			<tr><td>Simple</td><td>-1</td></tr>
+			<tr><td>Doble</td><td>-1</td></tr>
+			<tr><td>Triple</td><td>-1</td></tr>
+		</table>>];
+	block8 [label=<
+				<table border="0" cellborder="1" cellspacing="0">
+					<tr><td bgcolor="lightblue"><b>Bloque Archivo 8</b></td></tr>
+					<tr><td>informacion</td></tr>
+				</table>>];
+			inode7 [label=<
+		<table border="0" cellborder="1" cellspacing="0">
+			<tr><td colspan="2" bgcolor="blue"><font color="white"><b>INODO 7</b></font></td></tr>
+			<tr><td bgcolor="lightgray"><b>i_uid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_gid</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_size</b></td><td>0</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_atime</b></td><td>2025-03-26T18:17:04-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_ctime</b></td><td>2025-03-26T18:17:04-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_mtime</b></td><td>2025-03-26T18:17:04-06:00</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_type</b></td><td>1</td></tr>
+			<tr><td bgcolor="lightgray"><b>i_perm</b></td><td>664</td></tr>
+			<tr><td colspan="2" bgcolor="lightgreen"><b>Bloques Directos</b></td></tr>
+	<tr><td>0</td><td>9</td></tr><tr><td>1</td><td>-1</td></tr><tr><td>2</td><td>-1</td></tr><tr><td>3</td><td>-1</td></tr><tr><td>4</td><td>-1</td></tr><tr><td>5</td><td>-1</td></tr><tr><td>6</td><td>-1</td></tr><tr><td>7</td><td>-1</td></tr><tr><td>8</td><td>-1</td></tr><tr><td>9</td><td>-1</td></tr><tr><td>10</td><td>-1</td></tr><tr><td>11</td><td>-1</td></tr>
+			<tr><td colspan="2" bgcolor="lightyellow"><b>Bloques Indirectos</b></td></tr>
+			<tr><td>Simple</td><td>-1</td></tr>
+			<tr><td>Doble</td><td>-1</td></tr>
+			<tr><td>Triple</td><td>-1</td></tr>
+		</table>>];
+	block9 [label=<
+				<table border="0" cellborder="1" cellspacing="0">
+					<tr><td bgcolor="lightblue"><b>Bloque Archivo 9</b></td></tr>
+					<tr><td></td></tr>
+				</table>>];
+			block7 [label=<
+				<table border="0" cellborder="1" cellspacing="0">
+					<tr><td colspan="4" bgcolor="lightgreen"><b>Bloque Carpeta 7</b></td></tr>
+					<tr>
+						<td bgcolor="gray"><b>#</b></td>
+						<td bgcolor="gray"><b>Nombre</b></td>
+						<td bgcolor="gray"><b>Inodo</b></td>
+						<td bgcolor="gray"><b>Tipo</b></td>
+					</tr>
+				
+					<tr>
+						<td>1</td>
+						<td>.</td>
+						<td>5</td>
+						<td>Carpeta</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>mia.txt</td>
+						<td>6</td>
+						<td>Archivo</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td>compi.txt</td>
+						<td>7</td>
+						<td>Archivo</td>
+					</tr></table>>];
+inode6 -> block8 [color=black];
+inode7 -> block9 [color=black];
 block2 [label=<
 				<table border="0" cellborder="1" cellspacing="0">
 					<tr><td colspan="4" bgcolor="lightgreen"><b>Bloque Carpeta 2</b></td></tr>
@@ -166,10 +290,37 @@ block2 [label=<
 						<td>4</td>
 						<td>Carpeta</td>
 					</tr></table>>];
+block6 [label=<
+				<table border="0" cellborder="1" cellspacing="0">
+					<tr><td colspan="4" bgcolor="lightgreen"><b>Bloque Carpeta 6</b></td></tr>
+					<tr>
+						<td bgcolor="gray"><b>#</b></td>
+						<td bgcolor="gray"><b>Nombre</b></td>
+						<td bgcolor="gray"><b>Inodo</b></td>
+						<td bgcolor="gray"><b>Tipo</b></td>
+					</tr>
+				
+					<tr>
+						<td>1</td>
+						<td>.</td>
+						<td>2</td>
+						<td>Carpeta</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td>mia</td>
+						<td>5</td>
+						<td>Carpeta</td>
+					</tr></table>>];
 block3 -> inode3 [color=black];
+block3 -> inode8 [color=black];
 inode3 -> block3 [color=black];
 block5 -> inode4 [color=black];
 inode4 -> block5 [color=black];
+block7 -> inode5 [color=black];
+block7 -> inode6 [color=black];
+block7 -> inode7 [color=black];
+inode5 -> block7 [color=black];
 block0 [label=<
 				<table border="0" cellborder="1" cellspacing="0">
 					<tr><td colspan="4" bgcolor="lightgreen"><b>Bloque Carpeta 0</b></td></tr>
@@ -204,6 +355,9 @@ block2 -> inode2 [color=black];
 block2 -> inode3 [color=black];
 block2 -> inode4 [color=black];
 inode2 -> block2 [color=black];
+block6 -> inode2 [color=black];
+block6 -> inode5 [color=black];
+inode2 -> block6 [color=black];
 block0 -> inode0 [color=black];
 block0 -> inode1 [color=black];
 block0 -> inode2 [color=black];

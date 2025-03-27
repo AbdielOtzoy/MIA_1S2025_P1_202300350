@@ -65,7 +65,7 @@ func ParseRep(tokens []string) (string, error) {
 
 	message, err := commandRep(cmd)
 	if err != nil {
-		fmt.Println("Error:", err)
+		return "", fmt.Errorf("Error al generar el reporte: %v", err)
 	}
 
 	return fmt.Sprintf("Se ha generado el reporte: %s", message), nil
@@ -82,6 +82,7 @@ func contains(list []string, value string) bool {
 
 func commandRep(rep *REP) (string, error) {
 	mountedMbr, mountedSb, mountedDiskPath, err := stores.GetMountedPartitionRep(rep.id)
+	fmt.Println("mountedDiskPath", mountedDiskPath)
 	if err != nil {
 		return "", fmt.Errorf("Error al obtener la partición montada: %v", err)
 	}
