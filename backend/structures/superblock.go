@@ -201,6 +201,7 @@ func (sb *SuperBlock) CreateFolder(path string, parentsDir []string, destDir str
 
 // CreateFile crea un archivo en el sistema de archivos
 func (sb *SuperBlock) CreateFile(path string, parentsDir []string, destDir string, r bool, size int, content string, uid int32, gid int32) error {
+	fmt.Println("Creando archivo:", path, "contenido:", content)
 	return sb.createFileInode(path, 0, parentsDir, destDir, r, size, content, uid, gid)
 }
 

@@ -16,6 +16,8 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 	if err != nil {
 		return err
 	}
+	fmt.Println("Inodo deserializado correctamente")
+	inode.Print()
 	// Verificar si el inodo es de tipo carpeta
 	if inode.I_type[0] == '1' {
 		return nil
@@ -186,13 +188,13 @@ func (sb *SuperBlock) createFolderInInode(path string, inodeIndex int32, parents
 		// Crear un nuevo bloque de carpeta
 		block := &FolderBlock{}
 
-		block.Print()
-
 		// Deserializar el bloque
 		err := block.Deserialize(path, int64(sb.S_block_start+(blockIndex*sb.S_block_size))) // 64 porque es el tamaño de un bloque
 		if err != nil {
 			return err
 		}
+		fmt.Println("Bloque deserializado correctamente", blockIndex)
+		block.Print()
 
 		// Iterar sobre cada contenido del bloque, desde el index 2 porque los primeros dos son . y ..
 		for indexContent := 2; indexContent < len(block.B_content); indexContent++ {

@@ -48,7 +48,7 @@ func ReportMBR(mbr *structures.MBR, diskPath string, path string) error {
 
 		if partType == 'E' {
 			ebr := structures.EBR{}
-			err := ebr.DeserializeEBR(diskPath, int64(part.Part_start+32))
+			err := ebr.DeserializeEBR(diskPath, int64(part.Part_start))
 			if err != nil {
 				return fmt.Errorf("error al deserializar el EBR: %v", err)
 			}

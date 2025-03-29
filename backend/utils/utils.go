@@ -11,6 +11,8 @@ import (
 // convert a size and unit to bytes
 func ConvertToBytes(size int, unit string) (int, error) {
 	switch unit {
+	case "B":
+		return size, nil
 	case "K":
 		return size * 1024, nil
 	case "M":

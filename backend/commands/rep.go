@@ -21,9 +21,9 @@ func ParseRep(tokens []string) (string, error) {
 	
 	args := strings.Join(tokens, " ")
 
-	re := regexp.MustCompile(`-id=[^\s]+|-path="[^"]+"|-path=[^\s]+|-name=[^\s]+|-path_file_ls="[^"]+"|-path_file_ls=[^\s]+`)
+	re := regexp.MustCompile(`(?i)-id=[^\s]+|-path="[^"]+"|-path=[^\s]+|-name=[^\s]+|-path_file_ls="[^"]+"|-path_file_ls=[^\s]+`)
 
-	matches := re.FindAllString(args, -1)
+	matches := re.FindAllString(args, -1)	
 
 	for _, match := range matches {
 		kv := strings.SplitN(match, "=", 2)

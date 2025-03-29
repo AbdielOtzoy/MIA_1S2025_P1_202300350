@@ -127,22 +127,7 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 	parentDirs, destDir := utils.GetParentDirectories(dirPath)
 	fmt.Println("\nDirectorios padres:", parentDirs)
 	fmt.Println("Directorio destino:", destDir)
-
-
-	contentFile := ""
-	if contentPath != "" {
-		contentFile, err := utils.GetFileContent(contentPath)
-		if err != nil {
-		return fmt.Errorf("error al obtener el contenido del archivo: %w", err)
-		}
-		if contentFile != "" {
-			fmt.Println("Contenido del archivo:", contentFile)
-		} else {
-			fmt.Println("No se encontró el archivo de contenido.")
-		}
-	}
 	
-
 	if r {
 		fmt.Println("Opción -r activada")
 		pathSplited := utils.SplitPath(dirPath)
@@ -163,28 +148,59 @@ func createFile(dirPath string, r bool, size int, contentPath string, sb *struct
 			}
 
 			fmt.Printf("Creando la carpeta %s\n", path)
-			err = sb.CreateFolder(partitionPath, parentsDir, destDir, uid, gid)
+			err = createDirectory(path, false, sb, partitionPath, mountedPartition, uid, gid)
 			if err != nil {
 				return fmt.Errorf("error al crear la carpeta: %w", err)
 			}
 
-			fmt.Println("Inodos y bloques")
-			sb.PrintInodes(partitionPath)
-			sb.PrintBlocks(partitionPath)
+			// Serializar el superbloque
+			err = sb.Serialize(partitionPath, int64(mountedPartition.Part_start))
+			if err != nil {
+				return fmt.Errorf("error al serializar el superbloque: %w", err)
+			}
 
 			fmt.Println("Carpeta creada correctamente")
+		} 
+	} else {
+		// verificar que los directorios padres existan
+		pathSplited := utils.SplitPath(dirPath)
+		for _, path := range pathSplited {
+			fmt.Println("path:", path)
+			// verificar que cada carpeta padre exista
+			parentsDir, destDir := utils.GetParentDirectories(path)
+			fmt.Printf("Directorios padres: %v\n", parentsDir)
+			fmt.Printf("Directorio destino: %s\n", destDir)
+			exists, _ := sb.ExistsFolcer(partitionPath, parentsDir, destDir)
+			fmt.Println("exists", exists)
+			if !exists {
+				fmt.Printf("La carpeta %s no existe\n", path)
+				return fmt.Errorf("la carpeta %s no existe", path)
+			}
+
+			if exists {
+				fmt.Printf("La carpeta %s ya existe\n", path)
+				continue
+			}
 		}
 	}
 
+	contentFile := ""
+	contentFile, err := utils.GetFileContent(contentPath)
+	if err != nil {
+		contentFile = ""
+	}
+	if contentFile != "" {
+		fmt.Println("Contenido del archivo:", contentFile)
+	} else {
+		fmt.Println("No se encontró el archivo de contenido.")
+	}
+
+	fmt.Println("CONTENTFILE", contentFile)
 	// Crear el directorio segun el path proporcionado
-	err := sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile, uid, gid)
+	err = sb.CreateFile(partitionPath, parentDirs, destDir, r, size, contentFile, uid, gid)
 	if err != nil {
 		return fmt.Errorf("error al crear el directorio: %w", err)
 	}
-
-	// Imprimir inodos y bloques
-	sb.PrintInodes(partitionPath)
-	sb.PrintBlocks(partitionPath)
 
 	// Serializar el superbloque
 	err = sb.Serialize(partitionPath, int64(mountedPartition.Part_start))

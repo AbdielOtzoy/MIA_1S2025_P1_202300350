@@ -89,9 +89,12 @@ func (mbr *MBR) GetPartitionByName(name string) (*Partition, int) {
 	for i, partition := range mbr.Mbr_partitions {
 		partitionName := strings.Trim(string(partition.Part_name[:]), "\x00")
 		inputName := strings.Trim(name, "\x00")
+		fmt.Println("partitionName:", partitionName)
+		fmt.Println("inputName:", inputName)
+		fmt.Println("equal:", strings.EqualFold(partitionName, inputName))
 
 		if strings.EqualFold(partitionName, inputName) {
-			return &partition, i
+			return &partition, i+1
 		}
 	}
 
@@ -119,6 +122,16 @@ func (mbr *MBR) GetExtendedPartition() (*Partition, int) {
 	return nil, -1
 }
 
+// Get free space in the MBR
+func (mbr *MBR) GetFreeSpace() int32 {
+	var totalUsedSpace int32
+	for _, partition := range mbr.Mbr_partitions {
+		if partition.Part_start != -1 {
+			totalUsedSpace += partition.Part_size
+		}
+	}
+	return mbr.Mbr_size - totalUsedSpace
+}
 // print the values of the MBR struct
 func (mbr *MBR) PrintMBR() {
 	creationTime := time.Unix(int64(mbr.Mbr_creation_date), 0) // convert to time.Time

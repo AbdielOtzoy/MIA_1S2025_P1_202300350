@@ -173,9 +173,160 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 	}
 
 	// Iterar sobre cada bloque del inodo (apuntadores)
-	for _, blockIndex := range inode.I_block {
+	for i, blockIndex := range inode.I_block {
 		if blockIndex == -1 {
-			break
+			fmt.Println("No hay más bloques, creando uno nuevo")
+			fmt.Println("i:", i)
+
+			// 1. Crear y serializar un nuevo bloque de carpeta
+			newBlock := &FolderBlock{
+				B_content: [4]FolderContent{
+					{B_name: [12]byte{'.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'.', '.'}, B_inodo: inodeIndex},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+					{B_name: [12]byte{'-'}, B_inodo: -1},
+				},
+			}
+
+			// actualizar contenido del bloque
+			destDirByte := [12]byte{}
+			copy(destDirByte[:], destDir)
+			newBlock.B_content[2] = FolderContent{B_name: destDirByte, B_inodo: sb.S_inodes_count}
+
+			newBlockPos := sb.S_blocks_count
+
+			// Serializar el nuevo bloque
+			err = newBlock.Serialize(path, int64(sb.S_block_start+(newBlockPos*sb.S_block_size)))
+			if err != nil {
+				return err
+			}
+
+			// Actualizar bitmap de bloques
+			err = sb.UpdateBitmapBlock(path)
+			if err != nil {
+				return err
+			}
+
+			// Actualizar superbloque (nuevo bloque)
+			sb.S_blocks_count++
+			sb.S_free_blocks_count--
+			sb.S_first_blo += sb.S_block_size
+
+			// 2. Crear el inodo del nuevo archivo
+			folderInode := &Inode{
+				I_uid:   uid,
+				I_gid:   gid,
+				I_size:  0,
+				I_atime: float32(time.Now().Unix()),
+				I_ctime: float32(time.Now().Unix()),
+				I_mtime: float32(time.Now().Unix()),
+				I_block: [15]int32{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+				I_type:  [1]byte{'1'},
+				I_perm:  [3]byte{'6', '6', '4'},
+			}
+
+			content := ""
+			if contentFile != "" {
+				content = contentFile
+			} else {
+				// llenar el contenido con una cadena de numeros del 0 al 9 cuantas veces sea el tamaño
+				for i := 0; i < size; i++ {
+					content += string(i % 10 + '0')
+				}
+			}
+			fmt.Println("Contenido del archivo: ", content)
+
+			// crear un arreglo de bloques que almacene el contenido de 64 bytes
+			contentBlocks := make([]string, 0)
+			// dividir el contenido en bloques de 64 bytes
+			for i := 0; i < len(content); i += 64 {
+				if i+64 > len(content) {
+					contentBlocks = append(contentBlocks, content[i:])
+				} else {
+					contentBlocks = append(contentBlocks, content[i:i+64])
+				}
+			}
+			// iterar sobre cada bloque del file inode y asignar el contenido
+			for i := 0; i < len(contentBlocks); i++ {
+				// crear un nuevo bloque de archivo
+				fileBlock := &FileBlock{
+					B_content: [64]byte{},
+				}
+				// copiar el contenido del bloque
+				copy(fileBlock.B_content[:], contentBlocks[i])
+				
+				folderInode.I_block[i] = sb.S_blocks_count
+
+				// serializar el bloque
+				err = fileBlock.Serialize(path, int64(sb.S_block_start+(sb.S_blocks_count*sb.S_block_size)))
+				if err != nil {
+					return err
+				}
+
+				// Actualizar el bitmap de bloques
+				err = sb.UpdateBitmapBlock(path)
+				if err != nil {
+					return err
+				}
+
+				// Actualizar el superbloque
+				sb.S_blocks_count++
+				sb.S_free_blocks_count--
+				sb.S_first_blo += sb.S_block_size
+
+
+			}
+			if len(contentBlocks) == 0 {
+					// crear un bloque de archivo vacío
+					fileBlock := &FileBlock{
+						B_content: [64]byte{},
+					}
+
+					folderInode.I_block[0] = sb.S_blocks_count
+					// serializar el bloque
+					err = fileBlock.Serialize(path, int64(sb.S_block_start+(sb.S_blocks_count*sb.S_block_size)))
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el bitmap de bloques
+					err = sb.UpdateBitmapBlock(path)
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el superbloque
+					sb.S_blocks_count++
+					sb.S_free_blocks_count--
+					sb.S_first_blo += sb.S_block_size
+				}
+			// Serializar el inodo del archivo
+			err = folderInode.Serialize(path, int64(sb.S_first_ino))
+			if err != nil {
+				return err
+			}
+
+			// Actualizar el bitmap de inodos
+			err = sb.UpdateBitmapInode(path)
+			if err != nil {	
+				return err
+			}
+
+			// Actualizar el superbloque
+			sb.S_inodes_count++
+			sb.S_free_inodes_count--
+			sb.S_first_ino += sb.S_inode_size
+			fmt.Println("contenido del archivo para añadir al bloque: ", contentFile)
+
+			inode.I_block[i] = newBlockPos
+		
+			// Serializar el inodo actualizado
+			err = inode.Serialize(path, int64(sb.S_inode_start+(inodeIndex*sb.S_inode_size)))
+			if err != nil {
+				return err
+			}
+
+			return nil
 		}
 
 		block := &FolderBlock{}
@@ -241,11 +392,87 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 					I_atime: float32(time.Now().Unix()),
 					I_ctime: float32(time.Now().Unix()),
 					I_mtime: float32(time.Now().Unix()),
-					I_block: [15]int32{sb.S_blocks_count, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+					I_block: [15]int32{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 					I_type:  [1]byte{'1'},
 					I_perm:  [3]byte{'6', '6', '4'},
 				}
 
+				content := ""
+				if contentFile != "" {
+					content = contentFile
+				} else {
+					// llenar el contenido con una cadena de numeros del 0 al 9 cuantas veces sea el tamaño
+					for i := 0; i < size; i++ {
+						content += string(i % 10 + '0')
+					}
+				}
+				fmt.Println("Contenido del archivo: ", content)
+
+				// crear un arreglo de bloques que almacene el contenido de 64 bytes
+				contentBlocks := make([]string, 0)
+				// dividir el contenido en bloques de 64 bytes
+				for i := 0; i < len(content); i += 64 {
+					if i+64 > len(content) {
+						contentBlocks = append(contentBlocks, content[i:])
+					} else {
+						contentBlocks = append(contentBlocks, content[i:i+64])
+					}
+				}
+
+				// iterar sobre cada bloque del file inode y asignar el contenido
+				for i := 0; i < len(contentBlocks); i++ {
+					// crear un nuevo bloque de archivo
+					fileBlock := &FileBlock{
+						B_content: [64]byte{},
+					}
+					// copiar el contenido del bloque
+					copy(fileBlock.B_content[:], contentBlocks[i])
+					
+					fileInode.I_block[i] = sb.S_blocks_count
+
+					// serializar el bloque
+					err = fileBlock.Serialize(path, int64(sb.S_block_start+(sb.S_blocks_count*sb.S_block_size)))
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el bitmap de bloques
+					err = sb.UpdateBitmapBlock(path)
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el superbloque
+					sb.S_blocks_count++
+					sb.S_free_blocks_count--
+					sb.S_first_blo += sb.S_block_size
+
+
+				}
+				if len(contentBlocks) == 0 {
+					// crear un bloque de archivo vacío
+					fileBlock := &FileBlock{
+						B_content: [64]byte{},
+					}
+
+					fileInode.I_block[0] = sb.S_blocks_count
+					// serializar el bloque
+					err = fileBlock.Serialize(path, int64(sb.S_block_start+(sb.S_blocks_count*sb.S_block_size)))
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el bitmap de bloques
+					err = sb.UpdateBitmapBlock(path)
+					if err != nil {
+						return err
+					}
+
+					// Actualizar el superbloque
+					sb.S_blocks_count++
+					sb.S_free_blocks_count--
+					sb.S_first_blo += sb.S_block_size
+				}
 				// Serializar el inodo del archivo
 				err = fileInode.Serialize(path, int64(sb.S_first_ino))
 				if err != nil {
@@ -254,7 +481,7 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 
 				// Actualizar el bitmap de inodos
 				err = sb.UpdateBitmapInode(path)
-				if err != nil {
+				if err != nil {	
 					return err
 				}
 
@@ -262,38 +489,9 @@ func (sb *SuperBlock) createFileInode(path string, inodeIndex int32, parentsDir 
 				sb.S_inodes_count++
 				sb.S_free_inodes_count--
 				sb.S_first_ino += sb.S_inode_size
-				// Crear el bloque del archivo
-				// colocar contenido de prueba
+				fmt.Println("contenido del archivo para añadir al bloque: ", contentFile)
 
-				// convertir el contentFile a 64 bytes
-				contentByte := [64]byte{}
-				copy(contentByte[:], contentFile)
-				fileBlock := &FileBlock{
-					B_content: contentByte,
-				}
-
-				fmt.Println("Bloque de archivo: " )
-				fileBlock.Print()
-
-				// Serializar el bloque del archivo
-				err = fileBlock.Serialize(path, int64(sb.S_first_blo))
-				if err != nil {
-					return err
-				}
-
-				// Actualizar el bitmap de bloques
-				err = sb.UpdateBitmapBlock(path)
-				if err != nil {
-					return err
-				}
-
-				// Actualizar el superbloque
-				sb.S_blocks_count++
-				sb.S_free_blocks_count--
-				sb.S_first_blo += sb.S_block_size
-			
 				return nil
-			
 			}
 		}
 	}

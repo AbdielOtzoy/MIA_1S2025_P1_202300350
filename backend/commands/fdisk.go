@@ -26,7 +26,7 @@ func ParseFdisk(tokens []string) (string, error) {
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
 
-	re := regexp.MustCompile(`-size=\d+|-unit=[kKmM]|-fit=[bBfF]{2}|-path="[^"]+"|-path=[^\s]+|-type=[pPeElL]|-name="[^"]+"|-name=[^\s]+`)
+	re := regexp.MustCompile(`-size=\d+|-unit=[kKmMbB]|-fit=[bBfF]{2}|-path="[^"]+"|-path=[^\s]+|-type=[pPeElL]|-name="[^"]+"|-name=[^\s]+`)
 
 	matches := re.FindAllString(args, -1) // find all the matches
 
@@ -49,7 +49,8 @@ func ParseFdisk(tokens []string) (string, error) {
 				}
 				cmd.Size = size
 			case "-unit":
-				if value != "K" && value != "M" {
+				if value != "K" && value != "M" && value != "B" && value != "k" && value != "m" && value != "b" {
+					// K = Kilobytes, M = Megabytes, B = Bytes
 					return "", errors.New("invalid unit")
 				}
 				cmd.unit = strings.ToUpper(value)
@@ -107,7 +108,7 @@ func ParseFdisk(tokens []string) (string, error) {
 
 	err := commandFdisk(cmd)
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	return fmt.Sprintf("Partition %s created successfully", cmd.name), nil
@@ -115,6 +116,9 @@ func ParseFdisk(tokens []string) (string, error) {
 
 func commandFdisk(fdisk *FDISK) error {
 	sizeBytes, err := utils.ConvertToBytes(fdisk.Size, fdisk.unit) // convert the size to bytes
+	fmt.Println("size:", fdisk.Size)
+	fmt.Println("unit:", fdisk.unit)
+	fmt.Println("Size in bytes:", sizeBytes)
 	if err != nil {
 		fmt.Println("error converting size to bytes:", err)
 		return err
@@ -154,6 +158,12 @@ func createPrimaryPartition(fdisk *FDISK, sizeBytes int) error {
 		return err
 	}
 
+	// check if is there is space for the partition
+	freeSpace := mbr.GetFreeSpace()
+	if freeSpace < int32(sizeBytes) {
+		fmt.Println("not enough space in the MBR")
+		return errors.New("not enough space in the disk")
+	}
 	fmt.Println("MBR before creating primary partition")
 	mbr.PrintMBR()
 
@@ -209,8 +219,6 @@ func createExtendedPartition(fdisk *FDISK, sizeBytes int) error {
 		return errors.New("no available partition")
 	}
 
-
-
 	fmt.Println("MBR before creating extended partition")
 	mbr.PrintMBR()
 
@@ -235,7 +243,7 @@ func createExtendedPartition(fdisk *FDISK, sizeBytes int) error {
 	ebr := &structures.EBR{
 		Ebr_part_mount: [1]byte{'N'},
 		Ebr_part_fit:   [1]byte{fdisk.fit[0]},
-		Ebr_part_start: int32(startPartition + structures.EBRSize),
+		Ebr_part_start: int32(startPartition),
 		Ebr_part_size:  -1,
 		Ebr_part_next:  -1,
 		Ebr_part_name:  [16]byte{},
@@ -291,7 +299,7 @@ func createLogicalPartition(fdisk *FDISK, logicalSize int) error {
 
 	// Get the first ebr in the extendened partition, the first ebr is in the extendedPartition.Part_start + 32
 	ebr := &structures.EBR{}
-	err = ebr.DeserializeEBR(fdisk.path, int64(extendedPartition.Part_start+32))
+	err = ebr.DeserializeEBR(fdisk.path, int64(extendedPartition.Part_start))
 	if err != nil {
 		fmt.Println("error reading EBR:", err)
 	}

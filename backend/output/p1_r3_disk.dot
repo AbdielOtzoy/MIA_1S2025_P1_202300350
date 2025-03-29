@@ -11,8 +11,8 @@ digraph G {
 				</tr>
 				<tr>
 					<td>Primaria</td>
-					<td>1048576 bytes</td>
-					<td>10.00%</td>
+					<td>4194304 bytes</td>
+					<td>30.77%</td>
 				</tr>
 			
 				<tr>
@@ -20,8 +20,17 @@ digraph G {
 				</tr>
 				<tr>
 					<td>Primaria</td>
-					<td>2097152 bytes</td>
-					<td>20.00%</td>
+					<td>4194304 bytes</td>
+					<td>30.77%</td>
+				</tr>
+			
+				<tr>
+					<td colspan="4" bgcolor="yellow"><b>PARTICIÓN 3 (Primaria)</b></td>
+				</tr>
+				<tr>
+					<td>Primaria</td>
+					<td>1048576 bytes</td>
+					<td>7.69%</td>
 				</tr>
 			
 		<tr>
@@ -29,7 +38,7 @@ digraph G {
 		</tr>
 		<tr>
 			<td>Libre</td>
-			<td>7340032 bytes</td>
-			<td>70.00%</td>
+			<td>4194304 bytes</td>
+			<td>30.77%</td>
 		</tr>
 	</table>>]; }

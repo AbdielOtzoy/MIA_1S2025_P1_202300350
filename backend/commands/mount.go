@@ -61,7 +61,7 @@ func ParseMount(tokens []string) (string, error) {
 
 	err := commandMount(cmd)
 	if err != nil {
-		fmt.Println("error: ", err)
+		return "", err
 	}
 
 	return fmt.Sprintf("mounting partition %s in %s", cmd.name, cmd.path), nil
@@ -75,8 +75,21 @@ func commandMount(mount *MOUNT) error {
 		fmt.Println("error deserializing mbr: ", err)
 		return err
 	}
+	fmt.Println("name: ", mount.name)
+	fmt.Println("path: ", mount.path)
 
 	partition, indexPartition := mbr.GetPartitionByName(mount.name)
+	if indexPartition == -1 {
+		fmt.Println("partition not found")
+		return errors.New("partition not found")
+	}
+	fmt.Println("indexPartition: ", indexPartition)	
+
+	if stores.MountedPartitions[string(partition.Part_id[:])] != "" {
+		fmt.Println("partition already mounted")
+		return errors.New("partition already mounted")
+	}
+
 	if partition == nil {
 		fmt.Println("partition not found")
 		return errors.New("partition not found")
@@ -100,7 +113,7 @@ func commandMount(mount *MOUNT) error {
 	partition.PrintPartition()
 
 	// Save the changes in the mbr
-	mbr.Mbr_partitions[indexPartition] = *partition
+	mbr.Mbr_partitions[indexPartition-1] = *partition
 
 	err = mbr.SerializeMBR(mount.path)
 	if err != nil {

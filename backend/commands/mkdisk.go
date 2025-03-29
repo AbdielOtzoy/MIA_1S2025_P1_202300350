@@ -26,14 +26,31 @@ func ParseMkdisk(tokens []string) (string, error) {
 
 	args := strings.Join(tokens, " ") // join the tokens to get the arguments
 
-	// regular expression to get the size and unit
-	re := regexp.MustCompile(`-size=\d+|-unit=[kKmM]|-fit=[bBfFwW]{2}|-path="[^"]+"|-path=[^\s]+`)
+	// regular expression to validate all parameters (known and unknown)
+	paramRe := regexp.MustCompile(`-\w+=[^\s"]+|-\w+="[^"]+"`)
 
-	matches := re.FindAllString(args, -1)
+	// regular expression to get the valid parameters we want to process
+	validParamRe := regexp.MustCompile(`-size=\d+|-unit=[kKmM]|-fit=[bBfFwW]{2}|-path="[^"]+"|-path=[^\s]+`)
+
+	// First, check if there are any parameters that don't match our valid pattern
+	allParams := paramRe.FindAllString(args, -1)
+	for _, param := range allParams {
+		if !validParamRe.MatchString(param) {
+			// Extract the parameter name
+			kv := strings.SplitN(param, "=", 2)
+			if len(kv) > 0 {
+				return "", fmt.Errorf("invalid parameter '%s'", kv[0])
+			}
+			return "", errors.New("invalid parameter format")
+		}
+	}
+
+	// Now process the valid parameters
+	matches := validParamRe.FindAllString(args, -1)
 
 	for _, match := range matches {
-		// dibide the argument in the key and value
-		kv := strings.SplitN(match, "=", 3)
+		// divide the argument in the key and value
+		kv := strings.SplitN(match, "=", 2)
 		if len(kv) != 2 {
 			return "", errors.New("invalid argument")
 		}
@@ -44,32 +61,29 @@ func ParseMkdisk(tokens []string) (string, error) {
 		}
 
 		switch key {
-			case "-size":
-				size, err := strconv.Atoi(value) // convert the value to integer
-				if err != nil {
-					return "", errors.New("invalid size")
-				}
-				cmd.Size = size
-			case "-unit":
-				value = strings.ToUpper(value)
-				if value != "K" && value != "M" {
-					return "", errors.New("invalid unit")
-				}
-				cmd.unit = value
-			case "-fit":
-				value = strings.ToUpper(value)
-				if value != "FF" && value != "BF" && value != "WF" {
-					return "", errors.New("invalid fit")
-				}
-				cmd.fit = value
-			case "-path":
-				if value == "" {
-					return "", errors.New("invalid path")
-				}
-				cmd.path = value
-			default: 
-				return "", errors.New("invalid argument") // invalid argument
-
+		case "-size":
+			size, err := strconv.Atoi(value) // convert the value to integer
+			if err != nil {
+				return "", errors.New("invalid size")
+			}
+			cmd.Size = size
+		case "-unit":
+			value = strings.ToUpper(value)
+			if value != "K" && value != "M" {
+				return "", errors.New("invalid unit")
+			}
+			cmd.unit = value
+		case "-fit":
+			value = strings.ToUpper(value)
+			if value != "FF" && value != "BF" && value != "WF" {
+				return "", errors.New("invalid fit")
+			}
+			cmd.fit = value
+		case "-path":
+			if value == "" {
+				return "", errors.New("invalid path")
+			}
+			cmd.path = value
 		}
 	}
 
@@ -91,7 +105,7 @@ func ParseMkdisk(tokens []string) (string, error) {
 
 	err := commandMkdisk(cmd)
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	return fmt.Sprintf("Disk created with size %d%s, fit %s, and path %s", cmd.Size, cmd.unit, cmd.fit, cmd.path), nil

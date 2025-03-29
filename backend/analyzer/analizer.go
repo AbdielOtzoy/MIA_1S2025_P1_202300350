@@ -15,7 +15,9 @@ func Analyzer(input string) (string, error) {
 		return "", errors.New("no se proporcionó ningún comando")
 	}
 
-	switch tokens[0] {
+	command := strings.ToLower(tokens[0])
+
+	switch command {
 	case "mkdisk":
 		return commands.ParseMkdisk(tokens[1:])
 	case "rmdisk":
