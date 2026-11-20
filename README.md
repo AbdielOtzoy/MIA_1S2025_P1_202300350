@@ -4,7 +4,7 @@ The first version of my file system simulator. It creates virtual disks as binar
 
 Course project for *Manejo e Implementación de Archivos* (Universidad de San Carlos de Guatemala, 1st semester 2025). Individual work.
 
-**The complete version is [EXT3_fileSystem](https://github.com/AbdielOtzoy/EXT3_fileSystem).** It adds EXT3 journaling with crash simulation and recovery, `chmod`/`chown`, copy/move/rename/find, and a graphical file explorer.
+**The complete version is [ext3-filesystem-simulator](https://github.com/AbdielOtzoy/ext3-filesystem-simulator).** It adds EXT3 journaling with crash simulation and recovery, `chmod`/`chown`, copy/move/rename/find, and a graphical file explorer.
 
 ## Commands in this version
 
